@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "title": "Paper review",
+  "stage": "Awaiting first pass",
+  "manuscript": "Not yet identified",
+  "date": "Not yet reviewed",
+  "goals": "First pass on argument, evidence, and clarity.",
+  "summary": "The assistant has not reviewed the manuscript yet.",
+  "strengths": [],
+  "sources": [],
+  "coverage": [],
+  "checks": [],
+  "gaps": ["All scientific review work remains to be performed."],
+  "plan": [],
+  "findings": []
+}

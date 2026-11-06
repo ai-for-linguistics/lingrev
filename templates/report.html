@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="lingrev-template" content="2">
+<!-- Template contract 2, independent of review data schema_version.
+Keep the IDs used by assets/dashboard.js and all three insertion markers.
+Default views: Overview, Comments, Coverage & sources, How to.
+Preserve the sortable expandable Comments table and the two broad help illustrations.
+Project-specific changes belong in custom/report.html; merge them with the current
+kit template when upgrading this contract rather than changing only its version. -->
+<title>lingrev review</title>
+<style>__DASHBOARD_CSS__</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to review</a>
+<header>
+<div class="brand">lingrev / paper review</div>
+<h1 id="title">Review dashboard</h1>
+<p id="meta" class="meta"></p>
+<div class="tabs" role="tablist" aria-label="Review views">
+<button id="tab-overview" role="tab" aria-selected="true" aria-controls="overview" tabindex="0" type="button">Overview</button>
+<button id="tab-findings" role="tab" aria-selected="false" aria-controls="findings-section" tabindex="-1" type="button">Comments</button>
+<button id="tab-coverage" role="tab" aria-selected="false" aria-controls="coverage" tabindex="-1" type="button">Coverage &amp; sources</button>
+<button id="tab-instructions" role="tab" aria-selected="false" aria-controls="instructions" tabindex="-1" type="button">How to</button>
+</div>
+</header>
+<main id="main">
+<noscript>This dashboard needs JavaScript to display its review data. Ask your assistant for the companion review.md if JavaScript is unavailable.</noscript>
+<section id="overview" class="tab-panel" role="tabpanel" aria-labelledby="tab-overview" tabindex="0"><p id="stage" class="muted"></p><div class="synthesis"><p id="summary" class="overview"></p></div><div class="comment-distributions"><section aria-labelledby="category-chart-title"><h3 id="category-chart-title">Category of comments</h3><ul id="category-chart" class="bar-chart"></ul></section><section aria-labelledby="priority-chart-title"><h3 id="priority-chart-title">Priority of comments</h3><ul id="priority-chart" class="bar-chart"></ul></section></div><p id="goals"></p><h3>Identified strengths</h3><ul id="strengths"></ul></section>
+<section id="findings-section" class="tab-panel" role="tabpanel" aria-labelledby="tab-findings" tabindex="0" hidden><h2 class="print-only">Comments</h2>
+<p class="muted">Sort by a column heading. Expand a comment to see evidence, proposed changes, and next steps.</p>
+<div class="table-scroll" role="region" aria-label="Sortable review comments" tabindex="0"><table id="findings-table"><caption class="sr-only">Review comments. Column headings sort the list. Comment buttons expand the corresponding details.</caption><thead><tr>
+<th scope="col" data-key="id"><button type="button" data-sort="id">ID <span aria-hidden="true">↕</span></button></th>
+<th scope="col" data-key="title"><button type="button" data-sort="title">Comment <span aria-hidden="true">↕</span></button></th>
+<th scope="col" data-key="category"><button type="button" data-sort="category">Category <span aria-hidden="true">↕</span></button></th>
+<th scope="col" data-key="priority" aria-sort="ascending"><button type="button" data-sort="priority">Priority <span aria-hidden="true">↑</span></button></th>
+<th scope="col" data-key="status"><button type="button" data-sort="status">Status <span aria-hidden="true">↕</span></button></th>
+<th scope="col" data-key="resolution"><button type="button" data-sort="resolution">Resolution <span aria-hidden="true">↕</span></button></th>
+</tr></thead><tbody id="findings"></tbody></table></div>
+<p id="empty-findings" class="muted" hidden>No comments have been recorded yet. Ask the assistant to review the manuscript.</p>
+</section>
+<section id="coverage" class="tab-panel" role="tabpanel" aria-labelledby="tab-coverage" tabindex="0" hidden><h2 class="print-only">Coverage &amp; sources</h2><h3>Inspected sources</h3><ul id="sources" class="source-list"></ul><h3>Review coverage</h3><ul id="coverage-list"></ul><h3>Checks performed</h3><ul id="checks"></ul><h3>Gaps and limits</h3><ul id="gaps"></ul></section>
+<section id="instructions" class="tab-panel" role="tabpanel" aria-labelledby="tab-instructions" tabindex="0" hidden>
+<h2 class="print-only">How to</h2>
+<p class="ideas-intro">Look at the <button id="ideas-comments" class="inline-finding" type="button">Comments</button> tab and decide which comments you want to take into account.</p>
+<h3 class="ideas-heading">Expand your study, the review, or the form of the report.</h3>
+<p class="muted">Ask in the chat. Both the work and the report can evolve as you go.</p>
+<div id="next-ideas"></div>
+</section>
+</main>
+<footer>Generated with lingrev. This file runs locally. It does not send messages, run analyses, or save changes.</footer>
+<div id="copy-status" role="status" class="no-print"></div>
+<script id="review-data" type="application/json">__REVIEW_DATA__</script>
+<script>__DASHBOARD_JS__</script>
+</body>
+</html>

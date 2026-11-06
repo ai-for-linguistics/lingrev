@@ -1,0 +1,470 @@
+{
+  "schema_version": 1,
+  "title": "Context and interpretation",
+  "stage": "Extended review · fictional demonstration",
+  "manuscript": "Demonstration manuscript · demo-2",
+  "date": "2026-10-23",
+  "goals": "Demonstrate scientific and editorial feedback, visual comparisons, bounded analysis offers, and alternative ways to present a paper.",
+  "summary": "The manuscript compares interpretation choices across two contexts. Correct one reported percentage and qualify the claim of obligatory interpretation before drawing an inferential conclusion.",
+  "strengths": [
+    "The question and the comparison conditions are explicit in section 1.",
+    "Table 1 reports counts and denominators, so the percentages can be checked."
+  ],
+  "sources": [
+    "examples/manuscript.md, demo-2: complete fictional manuscript, sections 1–4, Table 1, and Figure 1.",
+    "examples/figures/choices-current.png: the supplied count plot for Figure 1."
+  ],
+  "coverage": [
+    "Read all four sections of the short demonstration manuscript.",
+    "Checked the reported percentages against Table 1 and the strength of the conclusion against the reported counts.",
+    "Checked the sentence in section 4 for agreement.",
+    "Inspected the supplied Figure 1 and prepared alternative plot and table presentations from the same reported counts."
+  ],
+  "checks": [
+    "Arithmetic from Table 1: 18 ÷ 24 × 100 = 75; 12 ÷ 24 × 100 = 50. This is a check of reported counts, not a reproduction from raw data.",
+    "All proposed visualizations reuse Table 1. Complement counts are 24 − 18 = 6 and 24 − 12 = 12. No paired records or new statistical evidence were generated."
+  ],
+  "gaps": [
+    "No participant-level records, stimuli, code, or inferential analysis were supplied.",
+    "No literature, venue guidelines, or formal proofs were inspected.",
+    "This fictional example does not demonstrate the accuracy of an AI review on a real manuscript.",
+    "Additional suggestions illustrate feedback possibilities. Candidate facts, cross-linguistic judgments, and proposed experiments have not been tested; no LLM judgments of missing stimuli were obtained.",
+    "The online frequency comparison has not been run. The manuscript does not yet define constructions X and Y, a corpus, or reproducible queries."
+  ],
+  "plan": [
+    "F01: Correct the context B percentage from 60% to 50%.",
+    "F02: Replace the claim of obligatory interpretation with a descriptive statement supported by the counts.",
+    "F03: If making an inferential claim, obtain paired response records and assess an appropriate analysis.",
+    "F04: Correct subject–verb agreement in the discussion."
+  ],
+  "findings": [
+    {
+      "id": "F01",
+      "category": "Evidence and results",
+      "title": "The context B percentage disagrees with Table 1",
+      "priority": "high",
+      "status": "observed",
+      "resolution": "open",
+      "location": "manuscript.md · section 3, Table 1 and first results sentence",
+      "evidence": "Table 1 gives 12 target choices out of 24 for context B. The prose says “60% in context B”. 12/24 = 50%.",
+      "why": "The prose misstates the size of the descriptive difference. The table gives a 25 percentage point difference, rather than the 15 points implied by the prose.",
+      "action": "If Table 1 is the intended source, change 60% to 50%. Confirm the table against the original records when they are available.",
+      "effort": "About 5 minutes for the prose correction; source-data verification depends on access to records.",
+      "current": "The target interpretation occurred in 75% of responses in context A and 60% in context B.",
+      "proposed": "The target interpretation occurred in 75% of responses in context A and 50% in context B.",
+      "rewrite_note": "This corrects the prose to match the supplied table. It does not establish that the underlying table is correct.",
+      "prompt": "For F01, check both percentages against Table 1 and draft the corrected results sentence. Keep source-data verification marked not checked.",
+      "evidence_kind": "calculation"
+    },
+    {
+      "id": "F02",
+      "category": "Counterevidence",
+      "title": "The obligatory interpretation claim exceeds the reported evidence",
+      "priority": "high",
+      "status": "observed",
+      "resolution": "open",
+      "location": "manuscript.md · section 3, final sentence, and section 4",
+      "evidence": "Section 3 says “context A forces the target interpretation”. Table 1 reports target choices for 18 of 24 participants in A.",
+      "why": "The reported response pattern does not establish that the interpretation is obligatory. A categorical claim would need an additional argument about the six remaining responses and the relation between judgments and interpretation.",
+      "action": "State the observed pattern and qualify the conclusion. If a categorical theoretical claim is intended, explain what bridges the responses to that claim.",
+      "effort": "About 15–30 minutes to revise the wording and inspect related claims.",
+      "current": "This difference proves that context A forces the target interpretation.",
+      "proposed": "The target interpretation was more frequent in context A than in context B in this sample.",
+      "rewrite_note": "The proposal states a descriptive result only. It makes no claim of statistical significance or obligatory interpretation.",
+      "prompt": "For F02, show descriptive alternatives to the categorical conclusion. Preserve uncertainty and identify what further argument would be needed for an obligatory interpretation claim.",
+      "evidence_kind": "paper"
+    },
+    {
+      "id": "F03",
+      "category": "Further work",
+      "title": "The paired comparison needs more than marginal totals",
+      "priority": "medium",
+      "status": "concern",
+      "resolution": "open",
+      "location": "manuscript.md · section 2 and Table 1",
+      "evidence": "Section 2 says “The same participants saw both contexts.” Table 1 provides only totals for each context.",
+      "why": "The marginal totals do not reveal which participants changed their responses. They are insufficient to reconstruct the paired response pattern for an inferential comparison.",
+      "action": "Needed if retaining an inferential claim: obtain participant-level paired outcomes and justify the analysis. A descriptive report can remain more limited. Do not invent the missing pairings.",
+      "effort": "Unknown until paired records and the intended claim are available.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "A rewrite cannot supply the missing paired records. No inferential test has been run.",
+      "prompt": "For F03, identify the paired response information needed for an inferential comparison. Explain what can and cannot be concluded from the supplied marginal totals. Do not invent records or run a test on assumed pairings.",
+      "evidence_kind": "paper"
+    },
+    {
+      "id": "F04",
+      "category": "Local rewrite",
+      "title": "Subject–verb agreement in the discussion",
+      "priority": "low",
+      "status": "observed",
+      "resolution": "open",
+      "location": "manuscript.md · section 4, first sentence",
+      "evidence": "“Our results demonstrates” uses a singular verb with a plural subject.",
+      "why": "The grammatical error is easy to correct. The rest of this sentence also carries the overclaim discussed in F02.",
+      "action": "Use “Our results demonstrate” if retaining this construction, then revise the claim consistently with F02.",
+      "effort": "About 1 minute for agreement, plus the substantive revision in F02.",
+      "current": "Our results demonstrates that the target interpretation is obligatory in context A.",
+      "proposed": "In context A, 18 of the 24 participants selected the target interpretation.",
+      "rewrite_note": "This proposal fixes agreement and replaces the unsupported categorical claim with a descriptive result, addressing F02 as well as F04.",
+      "prompt": "For F04, correct the agreement error and check that the complete revised discussion sentence also addresses F02.",
+      "evidence_kind": "paper"
+    },
+    {
+      "id": "F05",
+      "category": "Candidate fact",
+      "title": "A context change could help distinguish interpretation from response bias",
+      "priority": "medium",
+      "status": "suggestion",
+      "resolution": "open",
+      "location": "manuscript.md · sections 1–2",
+      "evidence": "The manuscript reports a context contrast but supplies neither the target sentence nor the context wording. No new judgments were elicited.",
+      "why": "A further contrast could separate a change in interpretation from other properties of the context or task.",
+      "action": "Once the actual sentence and contexts are available, propose a minimal contrast and the competing predictions. An initial LLM judgment may help generate hypotheses, but invite a test with speakers or data.",
+      "effort": "To estimate after agreeing on scope and available material.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "",
+      "prompt": "For F05, Once the actual sentence and contexts are available, propose a minimal contrast and the competing predictions. An initial LLM judgment may help generate hypotheses, but invite a test with speakers or data.",
+      "evidence_kind": "proposal",
+      "validation": "Obtain the missing stimuli, preserve the intended readings, then test with speakers or an appropriately designed experiment. No candidate outcome is established."
+    },
+    {
+      "id": "F06",
+      "category": "Cross-linguistic extension",
+      "title": "A matched contrast in another language could test the scope of the account",
+      "priority": "medium",
+      "status": "suggestion",
+      "resolution": "open",
+      "location": "manuscript.md · sections 1–2",
+      "evidence": "The manuscript does not identify a language, target sentence, or relevant construction. No cross-linguistic comparison has been performed.",
+      "why": "An equivalent contrast in another language could help identify which parts of an account depend on the construction or language.",
+      "action": "Ask which languages and speakers the author can access, then propose a specific construction and a matched comparison. Use an LLM for candidate materials or tentative judgments only, with uncertainty clearly labelled.",
+      "effort": "To estimate after agreeing on scope and available material.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "",
+      "prompt": "For F06, Ask which languages and speakers the author can access, then propose a specific construction and a matched comparison. Use an LLM for candidate materials or tentative judgments only, with uncertainty clearly labelled.",
+      "evidence_kind": "proposal",
+      "validation": "A competent speaker should check the construction, context, reading, and task. Translation alone does not ensure equivalence. Test the resulting predictions with data."
+    },
+    {
+      "id": "F07",
+      "category": "Principle clarification",
+      "title": "Clarify what “forces” commits the theory to",
+      "priority": "medium",
+      "status": "concern",
+      "resolution": "open",
+      "location": "manuscript.md · section 3, final sentence",
+      "evidence": "The manuscript says “context A forces the target interpretation” but does not define a theoretical principle connecting the context to the response.",
+      "why": "A categorical interpretation claim, a preference, and a response tendency make different commitments. This ambiguity matters independently of correcting the numerical report.",
+      "action": "Separate the original formulation from candidate improvements. State the intended principle precisely and compare its predictions with a weaker alternative.",
+      "effort": "About 30–60 minutes to clarify the intended claim; a new theory or test requires a separate estimate.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "",
+      "prompt": "For F07, Separate the original formulation from candidate improvements. State the intended principle precisely and compare its predictions with a weaker alternative.",
+      "evidence_kind": "paper",
+      "validation": "Clarify the intended theoretical claim with the author, then derive predictions and compare them with the available evidence."
+    },
+    {
+      "id": "F08",
+      "category": "Terminology",
+      "title": "Define “target interpretation” for a reader who cannot see the stimuli",
+      "priority": "high",
+      "status": "concern",
+      "resolution": "open",
+      "location": "manuscript.md · sections 1–2",
+      "evidence": "Both sections use “target interpretation” without giving the target sentence or specifying the interpretation.",
+      "why": "A reader cannot reconstruct what participants selected or assess the linguistic prediction from this abbreviated description.",
+      "action": "Supply the target sentence, intended reading, and response alternatives. Choose descriptive terminology once that content is available and use it consistently.",
+      "effort": "To estimate after agreeing on scope and available material.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "",
+      "prompt": "For F08, Supply the target sentence, intended reading, and response alternatives. Choose descriptive terminology once that content is available and use it consistently.",
+      "evidence_kind": "paper",
+      "validation": "Check the proposed terms against the actual stimuli and meanings. Do not invent a linguistic example from this abbreviated manuscript."
+    },
+    {
+      "id": "F09",
+      "category": "Paper structure",
+      "title": "An explicit limitations section could separate observation from inference",
+      "priority": "medium",
+      "status": "suggestion",
+      "resolution": "open",
+      "location": "manuscript.md · headings in sections 1–4",
+      "evidence": "The current sections are Question, Method, Results, and Discussion. The discussion repeats the obligatory interpretation claim.",
+      "why": "Separating the descriptive pattern from the limits of the evidence would make the argument easier to assess.",
+      "action": "Consider the outline below. Add a distinct limitations section only if it improves the full paper; a short limitations paragraph may suffice.",
+      "effort": "To estimate after agreeing on scope and available material.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "",
+      "prompt": "For F09, Consider the outline below. Add a distinct limitations section only if it improves the full paper; a short limitations paragraph may suffice.",
+      "evidence_kind": "proposal",
+      "validation": "This is an editorial proposal. Reassess the outline against the full manuscript and the venue’s constraints.",
+      "rewrites": [
+        {
+          "label": "Overall outline",
+          "current": "1. Question\n2. Method\n3. Results\n4. Discussion",
+          "proposed": "1. Question and predicted contrast\n2. Method and interpretation choices\n3. Descriptive results\n4. Limits of the current evidence\n5. Discussion and next tests",
+          "note": "The proposed headings are editorial suggestions, not claims that missing predictions or analyses already exist. The current headings reproduce the supplied manuscript."
+        }
+      ],
+      "offers": [
+        {
+          "title": "A · A question-led structure",
+          "focus": [
+            "Introduce the question and the competing predictions.",
+            "Present the method and descriptive results.",
+            "Separate limitations from the interpretation."
+          ],
+          "prompt": "For F09, propose a question-led outline. Show the current and proposed structures side by side and explain the purpose of each section. Use only content in the manuscript, marking missing predictions as work to supply."
+        },
+        {
+          "title": "B · An evidence-led structure",
+          "focus": [
+            "Open with the observed context contrast.",
+            "Introduce the theoretical issue the evidence raises.",
+            "Explain what the current evidence cannot settle."
+          ],
+          "prompt": "For F09, propose an evidence-led outline. Compare it with the current structure, without presenting the descriptive contrast as a causal or obligatory-interpretation result."
+        },
+        {
+          "title": "C · Compare several structures before rewriting",
+          "focus": [
+            "Provide three alternative outlines with different emphases.",
+            "Explain the strengths, tradeoffs, and missing material.",
+            "Wait for my choice before rewriting the full paper."
+          ],
+          "prompt": "For F09, propose three ways to structure this paper. Show each beside the current outline, identify the audience and main claim it foregrounds, and explain the tradeoffs. Do not rewrite the full manuscript yet."
+        }
+      ]
+    },
+    {
+      "id": "F10",
+      "category": "Alternative versions",
+      "title": "Would you like five abstract versions with different emphases?",
+      "priority": "medium",
+      "status": "suggestion",
+      "resolution": "open",
+      "location": "Whole manuscript · no abstract supplied",
+      "evidence": "The demonstration manuscript has no abstract. Any abstract would be a new proposed text based on the supplied body.",
+      "why": "Comparing emphases can help the author decide how to present the contribution without strengthening its evidence.",
+      "action": "Choose one direction below or ask for five alternatives spanning the directions. Keep the counts, limitations, and unresolved interpretation claim visible.",
+      "effort": "To estimate after agreeing on scope and available material.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "",
+      "prompt": "For F10, Choose one direction below or ask for five alternatives spanning the directions. Keep the counts, limitations, and unresolved interpretation claim visible.",
+      "evidence_kind": "proposal",
+      "validation": "The author should check every draft against the actual manuscript. No new results or novelty claims should appear.",
+      "offers": [
+        {
+          "title": "A · Emphasize the question and descriptive result",
+          "focus": [
+            "Lead with the context and interpretation question.",
+            "Report the observed counts and corrected percentages.",
+            "Keep the inference descriptive."
+          ],
+          "prompt": "For F10, draft one abstract emphasizing the research question and descriptive pattern. Use only the supplied manuscript. Do not imply statistical significance or obligatory interpretation. Show the current abstract beside the proposal if one is later supplied; otherwise label it a new draft."
+        },
+        {
+          "title": "B · Emphasize the distinction between a preference and an obligatory reading",
+          "focus": [
+            "Explain why the distinction matters.",
+            "Present the counts without claiming they settle the theory.",
+            "State which further argument or test remains necessary."
+          ],
+          "prompt": "For F10, draft one abstract emphasizing the distinction between preference and obligatory interpretation. Do not invent a linguistic example, theory, or result missing from the manuscript. Preserve the limitations."
+        },
+        {
+          "title": "C · Compare five ways to present the paper",
+          "focus": [
+            "Generate five versions spanning different emphases.",
+            "Use the same underlying facts and limitations in all five.",
+            "Explain the choices so the author can select or combine them."
+          ],
+          "prompt": "For F10, generate five proposed abstract versions with different emphases, including the question, descriptive evidence, and limits of interpretation. Use only results in the manuscript and the corrections in F01–F02. Do not invent novelty or significance. Explain the differences between versions; if an original abstract is supplied, show it beside each proposal."
+        }
+      ]
+    },
+    {
+      "id": "F11",
+      "category": "Plot presentation",
+      "title": "Start the count axis at zero and show the denominators",
+      "priority": "medium",
+      "status": "suggestion",
+      "resolution": "open",
+      "location": "manuscript.md · section 3, Figure 1",
+      "evidence": "Figure 1 shows 18 choices in context A and 12 in B, but its visible count axis starts at 10. The plot omits the denominator and percentage labels.",
+      "why": "The truncated bar axis magnifies the visual difference. Showing counts out of 24 with the percentages makes the descriptive comparison easier to read.",
+      "action": "Consider the proposed plot below: a zero baseline, a shared color, and explicit count/denominator labels. Keep this as a descriptive summary.",
+      "effort": "About 15–30 minutes for a presentation draft; author review still needed.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "",
+      "prompt": "For F11, revise the presentation of Figure 1 using a zero count baseline, one shared color, and labels 18/24 (75%) and 12/24 (50%). Preserve the underlying counts. Explain the design changes and do not add error bars or significance claims without the needed analysis.",
+      "evidence_kind": "paper",
+      "validation": "Verify every label and value against the source material before using the proposal.",
+      "figures": [
+        {
+          "label": "Figure 1 · count plot",
+          "current": "figures/choices-current.png",
+          "proposed": "figures/choices-proposed.png",
+          "note": "The proposal changes presentation only. Both images use the same counts from Table 1. No inferential result or uncertainty interval has been added."
+        }
+      ]
+    },
+    {
+      "id": "F12",
+      "category": "Table presentation",
+      "title": "Put counts, denominators, and percentages together",
+      "priority": "medium",
+      "status": "suggestion",
+      "resolution": "open",
+      "location": "manuscript.md · section 3, Table 1",
+      "evidence": "Table 1 currently has Context, Target interpretation, and Total columns. The percentages occur separately in the prose, where the B value is inconsistent (#01).",
+      "why": "A separate percentage column makes the prose/table mismatch easier to catch and reduces mental calculation for the reader.",
+      "action": "Consider the proposed table below. Clarify that each context has 24 participants and that the same participants appear in both conditions.",
+      "effort": "About 15–30 minutes for a presentation draft; author review still needed.",
+      "current": "Context | Target interpretation | Total\nA | 18 | 24\nB | 12 | 24",
+      "proposed": "Context | Target choices | Participants | Target (%)\nA | 18 | 24 | 75%\nB | 12 | 24 | 50%",
+      "rewrite_note": "The added percentages derive from the reported counts. This does not check the original participant records.",
+      "prompt": "For F12, reformat Table 1 with Context, Target choices, Participants, and Target (%) columns. Use A:18/24=75% and B:12/24=50%, and state that the same 24 participants saw both contexts. Give an editable Markdown or LaTeX table alongside the preview.",
+      "evidence_kind": "paper",
+      "validation": "Verify every label and value against the source material before using the proposal.",
+      "figures": [
+        {
+          "label": "Table 1 · presentation",
+          "current": "figures/table-current.png",
+          "proposed": "figures/table-proposed.png",
+          "note": "The current table reproduces the supplied table. The proposal adds a descriptive percentage column and an explicit sample note."
+        }
+      ]
+    },
+    {
+      "id": "F13",
+      "category": "Additional plot",
+      "title": "Show the composition of responses within each context",
+      "priority": "medium",
+      "status": "suggestion",
+      "resolution": "open",
+      "location": "manuscript.md · section 3",
+      "evidence": "The current figure shows only target choices. The supplied totals also determine how many participants did not select the target: 6 in A and 12 in B.",
+      "why": "A composition plot can make the non-target responses visible and help the reader assess the obligatory-interpretation claim in F02.",
+      "action": "Consider this additional descriptive plot, or use it in place of the count plot if it tells the story more clearly. It cannot show which individual participants changed responses.",
+      "effort": "About 15–30 minutes for a presentation draft; author review still needed.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "",
+      "prompt": "For F13, consider a 100% stacked horizontal plot for target versus non-target responses in each context. Use only the supplied totals and label counts. Explain whether it adds information for the reader or duplicates Figure 1; do not infer participant transitions from marginal totals.",
+      "evidence_kind": "proposal",
+      "validation": "Verify every label and value against the source material before using the proposal.",
+      "figures": [
+        {
+          "label": "Additional plot · response composition",
+          "current": "",
+          "proposed": "figures/composition-proposed.png",
+          "note": "A proposed additional view, absent from the supplied manuscript. Non-target counts are complements of the reported target counts. Pairings and uncertainty remain unavailable."
+        }
+      ],
+      "offers": [
+        {
+          "title": "A · Develop a more informative plot when paired records are available",
+          "focus": [
+            "Show within-participant changes rather than just marginal totals.",
+            "Choose a transition plot only if the paired records support it.",
+            "Keep the existing aggregate summary available for comparison."
+          ],
+          "prompt": "For F13, if participant-level paired records are supplied, propose a transition visualization. First inspect the records and explain what it would show beyond the marginal totals. Do not invent missing pairings."
+        }
+      ]
+    },
+    {
+      "id": "F14",
+      "category": "Online analysis",
+      "title": "Would you like a bounded corpus comparison of constructions X and Y?",
+      "priority": "low",
+      "status": "not checked",
+      "resolution": "open",
+      "location": "Potential follow-up · constructions and corpus not yet specified",
+      "evidence": "The manuscript does not specify constructions X and Y or provide corpus evidence. This is an optional analysis idea; no query has been run and no frequency result is known.",
+      "why": "A small, reproducible corpus check could test a frequency premise once the constructions are defined. Frequency by itself would not establish the interpretation mechanism.",
+      "action": "First define X and Y from the author’s actual examples. Then use one suitable accessible corpus, comparable queries, and a fixed scope. Report whether X is more frequent, Y is more frequent, or the result is inconclusive.",
+      "effort": "First attempt capped at 20 minutes after defining the constructions; availability may prevent completion.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "",
+      "prompt": "For F14, test whether construction X is more frequent than construction Y. Ask me to identify X and Y if needed, then define inclusion/exclusion rules. Propose one accessible documented corpus and comparable queries using the same language, sample, and counting unit. Keep the first attempt within 20 minutes and avoid paid access. Record the corpus version or access date, exact queries, returned counts, and appropriate denominators. Inspect up to 20 hits per construction for ambiguity without treating that inspection sample as the full frequency count. Flag overlapping categories, query limits, duplicates, and inaccessible totals. Report the result whichever way it goes, or explain why it cannot be determined. Do not substitute search-engine page-count estimates for corpus frequencies.",
+      "evidence_kind": "proposal",
+      "validation": "The author must confirm the construction definitions and query validity. No empirical conclusion is available until the actual queries and counts have been inspected.",
+      "offers": [
+        {
+          "title": "A · Prepare the queries before running anything",
+          "focus": [
+            "Define X and Y with concrete positive and negative examples.",
+            "Choose a comparable sample and counting unit.",
+            "Show the query plan, expected ambiguities, and stopping point."
+          ],
+          "prompt": "For F14, prepare a short reproducible query plan for comparing X and Y. Ask for missing construction definitions. Explain the corpus, counting unit, inclusion rules, denominators, and limitations. Do not run it until the scope is clear."
+        },
+        {
+          "title": "B · Run the bounded check once the scope is clear",
+          "focus": [
+            "Use a suitable accessible corpus and record exact queries.",
+            "Check ambiguous hits and acknowledge limits.",
+            "Report either ordering or an inconclusive result."
+          ],
+          "prompt": "For F14, use the agreed construction definitions and corpus to run the bounded frequency comparison in the main follow-up request. Keep the 20-minute stopping point, record reproducible queries and actual counts, and report the evidence regardless of which construction is more frequent."
+        }
+      ]
+    },
+    {
+      "id": "F15",
+      "category": "Presentation angles",
+      "title": "Would you like alternative titles and main headlines?",
+      "priority": "medium",
+      "status": "suggestion",
+      "resolution": "open",
+      "location": "Whole manuscript · title and main message",
+      "evidence": "The current demonstration title is “Demonstration manuscript: context and interpretation”. The body compares two contexts but does not establish an obligatory interpretation.",
+      "why": "Different titles and main messages can foreground the question, the descriptive evidence, or the limits of the theoretical inference. This changes the presentation rather than the underlying findings.",
+      "action": "Choose an angle below or ask for several title/headline pairs. Coordinate the preferred angle with an abstract version (F10) and outline (F09).",
+      "effort": "About 15–30 minutes for a presentation draft; author review still needed.",
+      "current": "",
+      "proposed": "",
+      "rewrite_note": "",
+      "prompt": "For F15, propose five title/main-headline pairs with different angles. For each, give the intended audience and bullet points explaining the emphasis. Compare them with the current title and coordinate with the abstract and structure options in F10 and F09. Preserve all limitations and do not claim obligatory interpretation, significance, or novelty unsupported by the manuscript.",
+      "evidence_kind": "proposal",
+      "validation": "Verify every label and value against the source material before using the proposal.",
+      "offers": [
+        {
+          "title": "A · Lead with the research question",
+          "focus": [
+            "Foreground the role of context in interpretation.",
+            "Leave the empirical outcome as a question-led contribution."
+          ],
+          "prompt": "For F15, suggest title/headline pairs leading with the research question. Explain the intended audience and keep the descriptive evidence and limitations intact."
+        },
+        {
+          "title": "B · Lead with the descriptive contrast",
+          "focus": [
+            "Foreground the difference in observed target choices.",
+            "State a sample pattern without implying a proven mechanism."
+          ],
+          "prompt": "For F15, suggest title/headline pairs emphasizing the descriptive context contrast. Use the corrected counts and avoid causal or categorical claims."
+        },
+        {
+          "title": "C · Lead with the theoretical distinction",
+          "focus": [
+            "Foreground preference versus obligatory interpretation.",
+            "Explain what the current evidence leaves unresolved."
+          ],
+          "prompt": "For F15, suggest title/headline pairs emphasizing the distinction between preference and obligatory interpretation. Do not imply that the present evidence resolves it. Explain how this angle would affect the abstract and section order."
+        }
+      ]
+    }
+  ]
+}

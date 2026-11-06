@@ -1,0 +1,431 @@
+<!doctype html>
+<!-- Slide layout, palette, and character symbols adapted from linglab.
+MIT License
+
+Copyright (c) 2026 Emmanuel Chemla
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>lingrev: review your paper</title><style>
+:root{
+  --bg:#f7f5ef; --card:#ffffff; --ink:#1d2742; --mute:#4a5572; --line:#c9cfdd;
+  --blue:#2f5fc4; --blue-l:#dbe6fb; --green:#1f8a5b; --green-l:#d4f0e2;
+  --red:#c63d37; --red-l:#f8dad8; --amber:#b87800; --amber-l:#fbebc4;
+  --grey-l:#e6e8ee; --purple:#6a49c2; --skin:#f2c9a0; --robot:#cdd7ea; --accent:#2f5fc4;
+}
+:root{color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+#deck{height:100vh;height:100dvh;position:relative;overflow:hidden}
+.slide{display:none;position:absolute;inset:0;padding:clamp(14px,3vw,40px) clamp(16px,5vw,64px) 56px;overflow:auto}
+.slide.active{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(12px,3vw,40px);align-content:center;align-items:center}
+.slide .txt{min-width:0}
+.slide h2{font-size:clamp(1.5rem,3.4vw,2.6rem);line-height:1.1;margin:0 0 .5em}
+.slide p{font-size:clamp(1.05rem,2vw,1.5rem);line-height:1.4;margin:.3em 0;color:var(--mute)}
+.slide .num{font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.slide figure{margin:0;min-width:0}
+.slide svg.fig{width:100%;height:auto;max-height:68vh;display:block;background:var(--card);border:1px solid var(--line);border-radius:16px}
+.slide.title.active{grid-template-columns:minmax(0,6fr) minmax(0,6fr)}
+.slide.s9 .head{grid-column:1/-1}
+.slide.s9.active{align-content:center;row-gap:clamp(8px,2vh,24px)}
+.slide.title h2{font-size:clamp(1.8rem,4vw,3.2rem)}
+@media (max-width:760px){.slide.active{grid-template-columns:1fr;align-content:start}.slide svg.fig{max-height:none}}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+pre.prompt{background:var(--card);border:2px solid var(--accent);border-radius:12px;padding:12px 14px;font-size:clamp(.85rem,1.6vw,1.15rem);white-space:pre-wrap;color:var(--ink);margin:.6em 0}
+button.copy{font:inherit;font-size:.9rem;padding:4px 10px;border-radius:8px;border:1px solid var(--accent);background:var(--card);color:var(--accent);cursor:pointer}
+.notes{display:none;position:fixed;left:0;right:0;bottom:0;max-height:45vh;overflow:auto;background:var(--card);color:var(--ink);border-top:3px solid var(--accent);padding:12px clamp(16px,5vw,64px) 60px;font-size:1.05rem;line-height:1.45;z-index:5}
+body.shownotes .slide.active .notes{display:block}
+#bar{position:fixed;left:0;top:0;height:5px;background:var(--accent);width:0;z-index:9;transition:width .2s}
+#ui{position:fixed;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 14px;font-size:.9rem;color:var(--mute);z-index:8;background:linear-gradient(transparent,var(--bg) 40%)}
+#ui button.nav:disabled{opacity:.3;cursor:default}
+#ui button.nav{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700;padding:8px 18px;min-height:40px}
+#ui button{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer;min-height:36px}
+#ui .fmid{flex:1;display:flex;align-items:center;justify-content:center;gap:18px;font-size:.72rem;line-height:1.35;color:var(--mute);margin:0 14px}
+#ui .fq,#ui .fd{text-align:left}
+#ui .fb{display:flex;flex-direction:column;align-items:stretch;gap:3px}
+#ui .fbtn{font:inherit;font-size:.72rem;display:block;padding:2px 10px;min-height:0;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--mute);text-decoration:none;cursor:pointer;text-align:center;line-height:1.25}
+#ui .fbtn:hover{color:var(--ink);border-color:var(--mute)}
+#ui .copybtn:hover::after,#ui .copybtn:focus-visible::after{top:auto;bottom:calc(100% + 8px);left:auto;right:0;text-align:left}
+@media (max-width:760px){#ui .hint{display:none}}
+.try{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.try .lab{font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.chip{font:inherit;font-size:clamp(.82rem,1.45vw,1.02rem);text-align:left;padding:7px 12px;border-radius:12px;border:1px solid var(--accent);background:var(--card);color:var(--ink);cursor:pointer;line-height:1.3}
+.chip:hover{background:var(--blue-l)}
+.chip.done::after{content:"  copied";color:var(--green);font-size:.8em}
+.slide.menu .txt p{font-size:clamp(.95rem,1.7vw,1.25rem)}
+.slide .sub{font-size:clamp(1.1rem,2.2vw,1.6rem);color:var(--accent);font-weight:600;margin:-.3em 0 .6em}
+.btns{display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;margin:.8em 0;max-width:36em}
+.btns .btn{flex:1 1 11em;width:auto}
+.btns .copybtn:hover::after,.btns .copybtn:focus-visible::after{left:auto;right:0}
+.btn{font:inherit;font-weight:700;font-size:clamp(.9rem,1.6vw,1.1rem);padding:10px 16px;border-radius:10px;border:2px solid var(--accent);background:var(--accent);color:var(--bg);cursor:pointer;text-decoration:none;display:block;width:100%;text-align:left}
+.btn.alt{background:var(--card);color:var(--accent)}
+.copybtn{position:relative}
+.copybtn:hover::after,.copybtn:focus-visible::after{content:attr(data-tip);position:absolute;left:0;top:calc(100% + 8px);z-index:30;width:min(34em,86vw);white-space:pre-wrap;background:var(--ink);color:var(--bg);padding:10px 12px;border-radius:8px;font:normal .82rem/1.35 ui-monospace,Menlo,Consolas,monospace;text-align:left;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.qbox{border:2px dashed var(--accent);border-radius:14px;padding:10px 16px 12px;margin:1em auto 0;max-width:36em;background:var(--card)}
+.qbox .btns{max-width:none;flex-direction:row;flex-wrap:wrap}
+.qbox .btn{flex:1 1 14em;width:auto;font-size:.95rem;padding:8px 12px;display:flex;align-items:center;gap:10px}
+.qn{flex:none;width:2.1em;height:2.1em;border-radius:50%;border:2px solid currentColor;display:grid;place-items:center;font-weight:800;font-size:1.3rem;line-height:1}
+.qbox .copybtn:hover::after,.qbox .copybtn:focus-visible::after{left:auto;right:0}
+.ver{font-weight:400;text-transform:none;letter-spacing:0;opacity:.8}
+.qbox .copybtn:hover::after,.qbox .copybtn:focus-visible::after{top:auto;bottom:calc(100% + 8px)}
+.learn{display:block;margin:10px auto 0;font:inherit;font-weight:600;font-size:clamp(1.05rem,2vw,1.5rem);background:transparent;border:0;color:var(--ink);text-decoration:none;cursor:pointer;padding:6px 8px}
+.qbox .lab{font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+.tip{font-size:clamp(.9rem,1.5vw,1.1rem);font-weight:700;color:var(--ink);margin:0 0 .5em;text-align:center}
+/* svg palette */
+.s-ink{stroke:var(--ink)} .t{fill:var(--ink);font-family:system-ui,sans-serif} .tm{fill:var(--mute);font-family:system-ui,sans-serif}
+.card{fill:var(--card);stroke:var(--line);stroke-width:2}
+.pass{fill:var(--green-l);stroke:var(--green);stroke-width:2} .fail{fill:var(--red-l);stroke:var(--red);stroke-width:2}
+.pend{fill:var(--grey-l);stroke:var(--mute);stroke-width:2;stroke-dasharray:4 3} .oos{fill:var(--card);stroke:var(--mute);stroke-width:2;stroke-dasharray:2 4}
+.conf{fill:var(--amber-l);stroke:var(--amber);stroke-width:2}
+.blue{fill:var(--blue-l);stroke:var(--blue);stroke-width:2}
+.ln{stroke:var(--ink);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.lm{stroke:var(--mute);stroke-width:2;fill:none;stroke-linecap:round}
+.gT{stroke:var(--green);stroke-width:4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.rT{stroke:var(--red);stroke-width:4;fill:none;stroke-linecap:round}
+.aT{stroke:var(--amber);stroke-width:4;fill:none;stroke-linecap:round}
+@media print{
+  @page{size:landscape;margin:10mm}
+  html,body{height:auto;background:#fff}
+  #deck{height:auto;overflow:visible}
+  .slide,.slide.active{display:grid;position:static;break-after:page;page-break-after:always;min-height:180mm;overflow:visible;padding:0}
+  #ui,#bar{display:none} .notes,body.shownotes .slide.active .notes{display:none}
+  button.copy{display:none}
+}
+
+a{color:var(--accent);text-underline-offset:3px}.slide p.small{font-size:clamp(.88rem,1.45vw,1.05rem);line-height:1.45}.slide figure figcaption{font-size:.78rem;color:var(--mute);text-align:center;margin-top:8px}.slide .txt p{margin:.55em 0}.slide .txt .num{margin-bottom:12px}.slide .txt h2{margin-bottom:.6em}.slide figure svg{aspect-ratio:auto}button,a{touch-action:manipulation}:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.btns .btn{text-align:center}.notices{font-size:.72rem;color:var(--mute);line-height:1.3}#ui .actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}#ui #count{white-space:nowrap;font-size:.8rem}#ui .fbtn{cursor:pointer}#ui{background:var(--bg);border-top:1px solid var(--line)}.slide{padding-bottom:112px}dialog{max-width:850px;width:92vw;max-height:88dvh;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:24px;background:var(--card);color:var(--ink)}dialog::backdrop{background:#1d2742b8}dialog h2{margin-top:0}dialog pre{font:14px/1.55 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);padding:16px}dialog .actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}dialog button{font:inherit;border-radius:6px;padding:8px 14px;cursor:pointer}#copy-status{font-size:.9rem}body.shownotes .slide.active .notes{bottom:88px}.sr-only{position:absolute;left:-9999px}
+@media(max-width:760px){.slide{padding-bottom:170px}.slide.active,.slide.title.active{grid-template-columns:1fr;align-content:start}.slide svg.fig{max-height:none}#ui{flex-wrap:wrap;justify-content:center}#ui .fmid{order:-1;flex:1 1 100%;margin:0;gap:10px;justify-content:space-between}#ui .notices{font-size:.65rem}#ui .nav{min-height:34px;padding:5px 12px}#ui .actions{justify-content:center}.slide figure figcaption{font-size:.75rem}body.shownotes .slide.active .notes{bottom:140px}}
+@media print{.slide,.slide.active,.slide.title.active{display:grid;grid-template-columns:5fr 7fr;padding:12px 0;min-height:175mm;gap:24px}.slide svg.fig{max-height:155mm}#ui,#bar,dialog,.btns,.print-hide{display:none!important}.slide .print-prompt{display:block;font-size:10pt}.slide .txt h2{font-size:26pt}.slide .txt p{font-size:15pt}.slide .txt p.small{font-size:12pt}}
+.print-prompt{display:none}
+
+/* Compact shared controls. The caution sits above the footer rule. */
+:root{--footer-height:64px}#ui{height:var(--footer-height)}#slide-caution{position:fixed;bottom:var(--footer-height);left:0;right:0;padding:8px 18px;background:var(--bg);color:var(--mute);font-size:.75rem;text-align:center;line-height:1.35;z-index:7}.slide{padding-bottom:140px}#ui .fmid{justify-content:center;gap:24px}#ui .fb{flex-direction:row;align-items:center;gap:8px}#ui .fbtn{padding:7px 12px;font-size:.8rem}#ui .notices{font-size:.7rem}
+@media(max-width:760px){:root{--footer-height:112px}.slide{padding-bottom:190px}#ui .fmid{gap:12px}#ui .fb{gap:5px}#ui .fbtn{font-size:.7rem;padding:6px 8px}#slide-caution{font-size:.7rem;padding:8px 16px}}
+@media print{#slide-caution{display:none!important}}
+</style></head><body>
+<div id="bar" aria-hidden="true"></div><main id="deck"><section class="slide title active" aria-labelledby="s1" data-title="lingrev: review your paper"><div class="txt"><div class="num">lingrev · beta</div><h2 id="s1">Review your paper<br>with an AI assistant</h2><p>Give the assistant a prompt. It starts the review and builds a dashboard.</p><p>Then ask for checks, rewrites, or a different view.</p><p class="small">The assistant does the work. You guide the review and decide what to revise.</p><p class="print-prompt">Launch prompt: ../PROMPT.md</p></div><figure data-figure="overview"><svg class="fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="img" aria-label="Research material goes to the assistant, then a dashboard. Questions loop back to the assistant."><style>text{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;fill:#1d2742}.muted{fill:#4a5572}.blue{fill:#dbe6fb;stroke:#2f5fc4;stroke-width:2}.pass{fill:#d4f0e2;stroke:#1f8a5b;stroke-width:2}.conf{fill:#fbebc4;stroke:#b87800;stroke-width:2}.fail{fill:#f8dad8;stroke:#c63d37;stroke-width:2}.card{fill:#fff;stroke:#c9cfdd;stroke-width:2}.line{fill:none;stroke:#1d2742;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.rule{stroke:#c9cfdd;stroke-width:2}</style><defs><symbol id="overview-linguist" viewBox="0 0 100 135">
+      <path d="M26 125v-40q0-18 24-18t24 18v40z" fill="#2f5fc4" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round" />
+      <circle cx="50" cy="40" r="22" fill="#f2c9a0" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M27 38q0-24 23-24t23 24q-10-10-23-9t-23 9z" fill="#1d2742" />
+      <circle cx="41" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="59" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M48 42h4M43 54q7 6 14 0" fill="none" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round" />
+      <rect x="58" y="88" width="30" height="22" rx="3" fill="#fbebc4" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M62 95h22M62 101h16" stroke="#1d2742" stroke-width="2" stroke-linecap="round" />
+    </symbol><symbol id="overview-robot" viewBox="0 0 100 135">
+      <path d="M50 14v10" stroke="#1d2742" stroke-width="2.5" /><circle cx="50" cy="11" r="5" fill="#b87800" stroke="#1d2742" stroke-width="2" />
+      <rect x="20" y="24" width="60" height="46" rx="12" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="38" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" /><circle cx="62" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="39" cy="46" r="3" fill="#1d2742" /><circle cx="63" cy="46" r="3" fill="#1d2742" />
+      <path d="M40 60h20" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round" />
+      <rect x="28" y="74" width="44" height="44" rx="10" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5" />
+      <rect x="38" y="84" width="24" height="14" rx="3" fill="#ffffff" stroke="#1d2742" stroke-width="2" />
+      <path d="M28 84l-10 14M72 84l10 14" stroke="#1d2742" stroke-width="3" stroke-linecap="round" />
+    </symbol><symbol id="overview-doc" viewBox="0 0 40 50"><path d="M4 2h24l8 8v38H4z" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round" /><path d="M10 18h20M10 25h20M10 32h14" stroke="#4a5572" stroke-width="2.5" stroke-linecap="round" /></symbol><marker id="overview-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#1d2742" /></marker></defs><rect width="640" height="420" rx="16" fill="#fff" /><use href="#overview-doc" x="34" y="92" width="58" height="73" /><use href="#overview-doc" x="66" y="111" width="58" height="73" /><text x="87" y="221" font-size="21" font-weight="700" text-anchor="middle" class="">Your material</text><text x="87" y="247" font-size="16" font-weight="400" text-anchor="middle" class="muted">paper + context</text><path d="M153 155H222" class="line" style="stroke:#1d2742" marker-end="url(#overview-arrow)" /><use href="#overview-robot" x="232" y="78" width="106" height="143" /><text x="285" y="250" font-size="21" font-weight="700" text-anchor="middle" class="">Assistant</text><path d="M348 155H406" class="line" style="stroke:#1d2742" marker-end="url(#overview-arrow)" /><rect x="425" y="72" width="188" height="204" rx="12" class="card" /><path d="M425 101V82Q425 72 435 72H603Q613 72 613 82V101Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><path d="M425 101H613" class="rule" /><circle cx="439" cy="86" r="3.5" fill="#c63d37" /><circle cx="452" cy="86" r="3.5" fill="#b87800" /><circle cx="465" cy="86" r="3.5" fill="#1f8a5b" /><text x="519" y="94" font-size="14" font-weight="700" text-anchor="middle" class="">Review</text><text x="438" y="126" font-size="16" font-weight="700">Comments</text><path d="M438 137H600" class="rule" /><rect x="438" y="148" width="162" height="33" rx="4" class="blue" /><text x="447" y="168" font-size="14" font-weight="600">Check claim X</text><rect x="438" y="192" width="162" height="33" rx="4" class="conf" /><text x="447" y="212" font-size="14" font-weight="600">Test Fact X</text><rect x="438" y="236" width="162" height="33" rx="4" class="pass" /><text x="447" y="256" font-size="14" font-weight="600">Fix Principle A</text><path d="M521 295V340H284V280" class="line" style="stroke:#1d2742" marker-end="url(#overview-arrow)" /><rect x="318" y="320" width="161" height="39" rx="8" class="blue" /><text x="398" y="345" font-size="18" font-weight="700" text-anchor="middle" class="">Ask and update</text><text x="320" y="393" font-size="19" font-weight="400" text-anchor="middle" class="muted">A first review, then the work you choose</text></svg>
+</figure><aside class="notes">The kit is an assistant-led workflow. The local commands manage files and render the review. They do not judge a manuscript.</aside></section><section class="slide " aria-labelledby="s2" data-title="Your material"><div class="txt"><div class="num">1 / What to give it</div><h2 id="s2">A paper is enough to begin</h2><p>Give it a paper as a PDF or readable source. Add relevant papers and links, or the whole working folder: code, data, figures, and notes.</p><p>Identify the current draft and any files to exclude.</p><p class="small">Goals, a deadline, or a target venue help when you have them. You can add them later.</p><p class="print-prompt">Launch prompt: ../PROMPT.md</p></div><figure data-figure="inputs"><svg class="fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="img" aria-label="A paper is sufficient. Literature, links, or the working folder can provide optional context."><style>text{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;fill:#1d2742}.muted{fill:#4a5572}.blue{fill:#dbe6fb;stroke:#2f5fc4;stroke-width:2}.pass{fill:#d4f0e2;stroke:#1f8a5b;stroke-width:2}.conf{fill:#fbebc4;stroke:#b87800;stroke-width:2}.fail{fill:#f8dad8;stroke:#c63d37;stroke-width:2}.card{fill:#fff;stroke:#c9cfdd;stroke-width:2}.line{fill:none;stroke:#1d2742;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.rule{stroke:#c9cfdd;stroke-width:2}</style><defs><symbol id="inputs-linguist" viewBox="0 0 100 135">
+      <path d="M26 125v-40q0-18 24-18t24 18v40z" fill="#2f5fc4" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round" />
+      <circle cx="50" cy="40" r="22" fill="#f2c9a0" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M27 38q0-24 23-24t23 24q-10-10-23-9t-23 9z" fill="#1d2742" />
+      <circle cx="41" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="59" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M48 42h4M43 54q7 6 14 0" fill="none" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round" />
+      <rect x="58" y="88" width="30" height="22" rx="3" fill="#fbebc4" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M62 95h22M62 101h16" stroke="#1d2742" stroke-width="2" stroke-linecap="round" />
+    </symbol><symbol id="inputs-robot" viewBox="0 0 100 135">
+      <path d="M50 14v10" stroke="#1d2742" stroke-width="2.5" /><circle cx="50" cy="11" r="5" fill="#b87800" stroke="#1d2742" stroke-width="2" />
+      <rect x="20" y="24" width="60" height="46" rx="12" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="38" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" /><circle cx="62" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="39" cy="46" r="3" fill="#1d2742" /><circle cx="63" cy="46" r="3" fill="#1d2742" />
+      <path d="M40 60h20" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round" />
+      <rect x="28" y="74" width="44" height="44" rx="10" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5" />
+      <rect x="38" y="84" width="24" height="14" rx="3" fill="#ffffff" stroke="#1d2742" stroke-width="2" />
+      <path d="M28 84l-10 14M72 84l10 14" stroke="#1d2742" stroke-width="3" stroke-linecap="round" />
+    </symbol><symbol id="inputs-doc" viewBox="0 0 40 50"><path d="M4 2h24l8 8v38H4z" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round" /><path d="M10 18h20M10 25h20M10 32h14" stroke="#4a5572" stroke-width="2.5" stroke-linecap="round" /></symbol><marker id="inputs-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#1d2742" /></marker></defs><rect width="640" height="420" rx="16" fill="#fff" />
+<rect x="16" y="36" width="346" height="346" rx="14" class="card" />
+<text x="38" y="70" font-size="21" font-weight="700">Your material</text>
+<rect x="32" y="89" width="314" height="75" rx="10" class="blue" />
+<use href="#inputs-doc" x="41" y="103" width="39" height="49" />
+<text x="93" y="119" font-size="20" font-weight="700">Your current paper</text>
+<text x="93" y="145" font-size="15">PDF or readable source</text>
+<text x="39" y="194" font-size="16" class="muted">Optional context</text>
+<rect x="32" y="208" width="314" height="64" rx="10" class="pass" />
+<use href="#inputs-doc" x="41" y="219" width="32" height="40" /><use href="#inputs-doc" x="53" y="225" width="32" height="40" />
+<text x="94" y="235" font-size="19" font-weight="700">Literature and links</text>
+<text x="94" y="258" font-size="14">Papers and claims to compare</text>
+<rect x="32" y="286" width="314" height="78" rx="10" class="conf" />
+<path d="M44 307H59L68 315H83V346H44Z" fill="#fff" stroke="#b87800" stroke-width="2" />
+<text x="94" y="315" font-size="19" font-weight="700">The working folder</text>
+<text x="94" y="339" font-size="14">Code, data, figures, notes…</text>
+<text x="94" y="357" font-size="12" class="muted">Name the current draft and exclusions.</text>
+<path d="M377 211H415" class="line" marker-end="url(#inputs-arrow)" />
+<g transform="translate(6 37)"><rect x="425" y="72" width="188" height="204" rx="12" class="card" /><path d="M425 101V82Q425 72 435 72H603Q613 72 613 82V101Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><path d="M425 101H613" class="rule" /><circle cx="439" cy="86" r="3.5" fill="#c63d37" /><circle cx="452" cy="86" r="3.5" fill="#b87800" /><circle cx="465" cy="86" r="3.5" fill="#1f8a5b" /><text x="519" y="94" font-size="14" font-weight="700" text-anchor="middle" class="">Review</text><text x="438" y="126" font-size="16" font-weight="700">Comments</text><path d="M438 137H600" class="rule" /><rect x="438" y="148" width="162" height="33" rx="4" class="blue" /><text x="447" y="168" font-size="14" font-weight="600">Check claim X</text><rect x="438" y="192" width="162" height="33" rx="4" class="conf" /><text x="447" y="212" font-size="14" font-weight="600">Test Fact X</text><rect x="438" y="236" width="162" height="33" rx="4" class="pass" /><text x="447" y="256" font-size="14" font-weight="600">Fix Principle A</text></g></svg>
+</figure><aside class="notes">A working folder can give context, but the assistant should respect exclusions and identify the current manuscript.</aside></section><section class="slide " aria-labelledby="s3" data-title="Read the report"><div class="txt"><div class="num">2 / The first review</div><h2 id="s3">Feedback with evidence</h2><p>Overview summarizes the review, your goals, and the strengths to preserve.</p><p>In Comments, sort the table and expand a row for evidence, checks, and next steps. Compare current and proposed text side by side.</p><p class="small">Coverage &amp; sources records what was inspected, checked, or left open. A missing comment does not mean a check passed.</p><p class="small"><a href="../examples/report.html" target="_blank" rel="noopener">Open the example dashboard</a></p><p class="print-prompt">Launch prompt: ../PROMPT.md</p></div><figure data-figure="evidence"><svg class="fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="group" aria-label="A colored Comments table. Click a comment or use Enter or Space to expand its evidence and next steps."><style>text{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;fill:#1d2742}.muted{fill:#4a5572}.blue{fill:#dbe6fb;stroke:#2f5fc4;stroke-width:2}.pass{fill:#d4f0e2;stroke:#1f8a5b;stroke-width:2}.conf{fill:#fbebc4;stroke:#b87800;stroke-width:2}.fail{fill:#f8dad8;stroke:#c63d37;stroke-width:2}.card{fill:#fff;stroke:#c9cfdd;stroke-width:2}.line{fill:none;stroke:#1d2742;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.rule{stroke:#c9cfdd;stroke-width:2}</style><defs><symbol id="evidence-linguist" viewBox="0 0 100 135">
+      <path d="M26 125v-40q0-18 24-18t24 18v40z" fill="#2f5fc4" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round" />
+      <circle cx="50" cy="40" r="22" fill="#f2c9a0" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M27 38q0-24 23-24t23 24q-10-10-23-9t-23 9z" fill="#1d2742" />
+      <circle cx="41" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="59" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M48 42h4M43 54q7 6 14 0" fill="none" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round" />
+      <rect x="58" y="88" width="30" height="22" rx="3" fill="#fbebc4" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M62 95h22M62 101h16" stroke="#1d2742" stroke-width="2" stroke-linecap="round" />
+    </symbol><symbol id="evidence-robot" viewBox="0 0 100 135">
+      <path d="M50 14v10" stroke="#1d2742" stroke-width="2.5" /><circle cx="50" cy="11" r="5" fill="#b87800" stroke="#1d2742" stroke-width="2" />
+      <rect x="20" y="24" width="60" height="46" rx="12" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="38" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" /><circle cx="62" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="39" cy="46" r="3" fill="#1d2742" /><circle cx="63" cy="46" r="3" fill="#1d2742" />
+      <path d="M40 60h20" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round" />
+      <rect x="28" y="74" width="44" height="44" rx="10" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5" />
+      <rect x="38" y="84" width="24" height="14" rx="3" fill="#ffffff" stroke="#1d2742" stroke-width="2" />
+      <path d="M28 84l-10 14M72 84l10 14" stroke="#1d2742" stroke-width="3" stroke-linecap="round" />
+    </symbol><symbol id="evidence-doc" viewBox="0 0 40 50"><path d="M4 2h24l8 8v38H4z" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round" /><path d="M10 18h20M10 25h20M10 32h14" stroke="#4a5572" stroke-width="2.5" stroke-linecap="round" /></symbol><marker id="evidence-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#1d2742" /></marker></defs><rect width="640" height="420" rx="16" fill="#fff" /><rect x="15" y="46" width="610" height="359" rx="10" class="card" /><text x="15" y="28" font-size="15" font-weight="700">Dashboard</text><text x="625" y="28" font-size="13" font-weight="400" text-anchor="end">Click a comment to expand it</text><g><path d="M15 92H625" fill="none" stroke="#c9cfdd" stroke-width="2" /><path d="M28 92V56Q28 46 38 46H118Q128 46 128 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="78.0" y="75" font-size="16" font-weight="400" text-anchor="middle">Overview</text><path d="M130 92V56Q130 46 140 46H240Q250 46 250 56V92" fill="#fff" stroke="#c9cfdd" stroke-width="2" /><path d="M131 92H249" stroke="#fff" stroke-width="4" /><text x="190.0" y="75" font-size="16" font-weight="700" text-anchor="middle">Comments</text><path d="M252 92V56Q252 46 262 46H462Q472 46 472 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="362.0" y="75" font-size="16" font-weight="400" text-anchor="middle">Coverage &amp; sources</text><path d="M474 92V56Q474 46 484 46H602Q612 46 612 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="543.0" y="75" font-size="16" font-weight="400" text-anchor="middle">How to</text></g><text x="39" y="108" font-size="12" font-weight="700">ID ↕</text><text x="75" y="108" font-size="12" font-weight="700">Comment ↕</text><text x="295" y="108" font-size="12" font-weight="700">Category ↕</text><text x="391" y="108" font-size="12" font-weight="700">Priority ↑</text><text x="470" y="108" font-size="12" font-weight="700">Status ↕</text><text x="543" y="108" font-size="12" font-weight="700">Resolution ↕</text><g data-comment-row="0" transform="translate(0 123)" role="button" tabindex="0" aria-expanded="false" aria-label="#01: Check claim X. Expand or collapse details." style="cursor:pointer"><rect x="28" y="0" width="584" height="35" rx="4" class="blue" /><text x="39" y="23" font-size="12" font-weight="400"><tspan font-size="8">#</tspan>01</text><text x="75" y="23" font-size="12" font-weight="600" data-comment-title="">▸ Check claim X</text><text x="295" y="23" font-size="12" font-weight="400">Analysis</text><text x="391" y="23" font-size="12" font-weight="400">High</text><text x="470" y="23" font-size="12" font-weight="400">Observed</text><text x="543" y="23" font-size="12" font-weight="400">Open</text></g><g data-comment-row="1" transform="translate(0 159)" role="button" tabindex="0" aria-expanded="false" aria-label="#02: Test Fact X. Expand or collapse details." style="cursor:pointer"><rect x="28" y="0" width="584" height="35" rx="4" class="conf" /><text x="39" y="23" font-size="12" font-weight="400"><tspan font-size="8">#</tspan>02</text><text x="75" y="23" font-size="12" font-weight="600" data-comment-title="">▸ Test Fact X</text><text x="295" y="23" font-size="12" font-weight="400">New fact</text><text x="391" y="23" font-size="12" font-weight="400">High</text><text x="470" y="23" font-size="12" font-weight="400">Concern</text><text x="543" y="23" font-size="12" font-weight="400">Open</text></g><g data-comment-row="2" transform="translate(0 195)" role="button" tabindex="0" aria-expanded="true" aria-label="#03: Fix Principle A. Expand or collapse details." style="cursor:pointer"><rect x="28" y="0" width="584" height="35" rx="4" class="pass" /><text x="39" y="23" font-size="12" font-weight="400"><tspan font-size="8">#</tspan>03</text><text x="75" y="23" font-size="12" font-weight="600" data-comment-title="">▾ Fix Principle A</text><text x="295" y="23" font-size="12" font-weight="400">Theory</text><text x="391" y="23" font-size="12" font-weight="400">Medium</text><text x="470" y="23" font-size="12" font-weight="400">Suggestion</text><text x="543" y="23" font-size="12" font-weight="400">Open</text></g><g data-comment-detail="" transform="translate(0 231)"><rect x="28" width="584" height="145" fill="#f7f9fc" /><g data-comment-content="0" style="display:none"><text x="39" y="20" font-size="13" font-weight="700">Section 3 · Table 1</text><text x="39" y="43" font-size="12" font-weight="700">Evidence / basis:</text><text x="157" y="43" font-size="12" font-weight="400">12 / 24 = 50%; the prose says 60%.</text><text x="39" y="66" font-size="12" font-weight="700">What still needs testing:</text><text x="203" y="66" font-size="12" font-weight="400">Check the underlying records.</text><text x="39" y="89" font-size="12" font-weight="700">Next action:</text><text x="126" y="89" font-size="12" font-weight="400">Correct the prose after checking the records.</text><text x="39" y="112" font-size="12" font-weight="700">Current</text><text x="333" y="112" font-size="12" font-weight="700">Proposed</text><text x="39" y="135" font-size="13" font-weight="400">“60% chose the target.”</text><text x="333" y="135" font-size="13" font-weight="400">“50% chose the target.”</text><path d="M317 100V140" class="rule" /></g><g data-comment-content="1" style="display:none"><text x="39" y="20" font-size="13" font-weight="700">Section 4 · A candidate contrast</text><text x="39" y="43" font-size="12" font-weight="700">Evidence / basis:</text><text x="157" y="43" font-size="12" font-weight="400">The assistant predicts a contrast for Fact X.</text><text x="39" y="66" font-size="12" font-weight="700">What still needs testing:</text><text x="203" y="66" font-size="12" font-weight="400">Obtain judgments from speakers.</text><text x="39" y="89" font-size="12" font-weight="700">Next action:</text><text x="126" y="89" font-size="12" font-weight="400">Test the examples; update the theory if needed.</text><text x="39" y="112" font-size="12" font-weight="700">Current</text><text x="333" y="112" font-size="12" font-weight="700">Proposed</text><text x="39" y="135" font-size="13" font-weight="400">Fact X is untested.</text><text x="333" y="135" font-size="13" font-weight="400">A concrete speaker study.</text><path d="M317 100V140" class="rule" /></g><g data-comment-content="2"><text x="39" y="20" font-size="13" font-weight="700">Section 2 · Principle A</text><text x="39" y="43" font-size="12" font-weight="700">Evidence / basis:</text><text x="157" y="43" font-size="12" font-weight="400">The domain of Principle A is imprecise.</text><text x="39" y="66" font-size="12" font-weight="700">What still needs testing:</text><text x="203" y="66" font-size="12" font-weight="400">Check the revised principle against all facts.</text><text x="39" y="89" font-size="12" font-weight="700">Next action:</text><text x="126" y="89" font-size="12" font-weight="400">Specify the domain and test its predictions.</text><text x="39" y="112" font-size="12" font-weight="700">Current</text><text x="333" y="112" font-size="12" font-weight="700">Proposed</text><text x="39" y="135" font-size="13" font-weight="400">“Apply A when relevant.”</text><text x="333" y="135" font-size="13" font-weight="400">“Apply A to finite clauses.”</text><path d="M317 100V140" class="rule" /></g></g></svg>
+</figure><aside class="notes">Walk through the discrepancy: the table gives 12 out of 24, which is 50%. Checking this arithmetic does not validate the source records.</aside></section><section class="slide " aria-labelledby="s4" data-title="Chat and dashboard"><div class="txt"><div class="num">3 / Two interfaces</div><h2 id="s4">Talk in the chat.<br>Read in the dashboard.</h2><p>Keep them side by side. Ask for a change, then reload the page.</p><p>Question a finding, request a check, ask for a rewrite, and even ask for a change in the dashboard itself.</p><p class="small">How to illustrates how the work and report can evolve. Specific requests to copy are in Comments; paste one into the chat to continue.</p><p class="print-prompt">Launch prompt: ../PROMPT.md</p></div><figure data-figure="setup"><svg class="fig" xmlns="http://www.w3.org/2000/svg" width="640" height="444" viewBox="0 -34 640 444" role="img" aria-label="A computer screen showing two app windows side by side: an Assistant window with a question and response, and a Browser window with the review dashboard"><style>/* svg palette */
+.s-ink{stroke:#1d2742} .t{fill:#1d2742;font-family:system-ui,sans-serif} .tm{fill:#4a5572;font-family:system-ui,sans-serif}
+.card{fill:#ffffff;stroke:#c9cfdd;stroke-width:2}
+.pass{fill:#d4f0e2;stroke:#1f8a5b;stroke-width:2} .fail{fill:#f8dad8;stroke:#c63d37;stroke-width:2}
+.pend{fill:#e6e8ee;stroke:#4a5572;stroke-width:2;stroke-dasharray:4 3} .oos{fill:#ffffff;stroke:#4a5572;stroke-width:2;stroke-dasharray:2 4}
+.conf{fill:#fbebc4;stroke:#b87800;stroke-width:2}
+.blue{fill:#dbe6fb;stroke:#2f5fc4;stroke-width:2}
+.ln{stroke:#1d2742;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.lm{stroke:#4a5572;stroke-width:2;fill:none;stroke-linecap:round}
+.gT{stroke:#1f8a5b;stroke-width:4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.rT{stroke:#c63d37;stroke-width:4;fill:none;stroke-linecap:round}
+.aT{stroke:#b87800;stroke-width:4;fill:none;stroke-linecap:round}
+</style><svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="setup-linguist" viewBox="0 0 100 135">
+      <path d="M26 125v-40q0-18 24-18t24 18v40z" fill="#2f5fc4" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round" />
+      <circle cx="50" cy="40" r="22" fill="#f2c9a0" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M27 38q0-24 23-24t23 24q-10-10-23-9t-23 9z" fill="#1d2742" />
+      <circle cx="41" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="59" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M48 42h4M43 54q7 6 14 0" fill="none" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round" />
+      <rect x="58" y="88" width="30" height="22" rx="3" fill="#fbebc4" stroke="#1d2742" stroke-width="2.5" />
+      <path d="M62 95h22M62 101h16" stroke="#1d2742" stroke-width="2" stroke-linecap="round" />
+    </symbol>
+    <symbol id="setup-robot" viewBox="0 0 100 135">
+      <path d="M50 14v10" stroke="#1d2742" stroke-width="2.5" /><circle cx="50" cy="11" r="5" fill="#b87800" stroke="#1d2742" stroke-width="2" />
+      <rect x="20" y="24" width="60" height="46" rx="12" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="38" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" /><circle cx="62" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" />
+      <circle cx="39" cy="46" r="3" fill="#1d2742" /><circle cx="63" cy="46" r="3" fill="#1d2742" />
+      <path d="M40 60h20" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round" />
+      <rect x="28" y="74" width="44" height="44" rx="10" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5" />
+      <rect x="38" y="84" width="24" height="14" rx="3" fill="#ffffff" stroke="#1d2742" stroke-width="2" />
+      <path d="M28 84l-10 14M72 84l10 14" stroke="#1d2742" stroke-width="3" stroke-linecap="round" />
+    </symbol>
+    <symbol id="setup-ok" viewBox="0 0 20 20"><path d="M4 10l4 4 8-9" class="gT" /></symbol>
+    <symbol id="setup-no" viewBox="0 0 20 20"><path d="M4 4l12 12M16 4L4 16" class="rT" /></symbol>
+    <symbol id="setup-doc" viewBox="0 0 40 50"><path d="M4 2h24l8 8v38H4z" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round" /><path d="M10 18h20M10 25h20M10 32h14" stroke="#4a5572" stroke-width="2.5" stroke-linecap="round" /></symbol>
+  </defs>
+</svg>
+      <text x="119" y="-12" text-anchor="middle" font-size="15" font-weight="700" class="t">The Chat</text>
+      <text x="433" y="-12" text-anchor="middle" font-size="15" font-weight="700" class="t">The Dashboard</text>
+      <rect x="6" y="0" width="628" height="334" rx="14" class="card" style="stroke:#1d2742;stroke-width:3" />
+      <rect x="14" y="10" width="210" height="314" class="card" /><rect x="240" y="10" width="386" height="314" class="card" />
+      <rect x="14" y="10" width="210" height="28" style="fill:#e6e8ee;stroke:#c9cfdd;stroke-width:2" /><rect x="240" y="10" width="386" height="28" style="fill:#e6e8ee;stroke:#c9cfdd;stroke-width:2" />
+
+      <circle cx="28" cy="24" r="4.5" style="fill:#c63d37" /><circle cx="43" cy="24" r="4.5" style="fill:#b87800" /><circle cx="58" cy="24" r="4.5" style="fill:#1f8a5b" />
+      <text x="119" y="30" text-anchor="middle" font-size="14" font-weight="700" class="t">Assistant</text>
+      <circle cx="254" cy="24" r="4.5" style="fill:#c63d37" /><circle cx="269" cy="24" r="4.5" style="fill:#b87800" /><circle cx="284" cy="24" r="4.5" style="fill:#1f8a5b" />
+      <text x="433" y="30" text-anchor="middle" font-size="14" font-weight="700" class="t">Browser</text>
+      <style>text{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;fill:#1d2742}.muted{fill:#4a5572}.rule{stroke:#c9cfdd;stroke-width:2}</style><rect x="24" y="56" width="184" height="56" rx="10" class="blue" />
+<use href="#setup-linguist" x="31" y="68" width="20" height="27" />
+<text x="57" y="78" font-size="11" class="t">What should I check first?</text>
+<text x="57" y="95" font-size="11" class="t">I have two hours.</text>
+<rect x="45" y="132" width="169" height="73" rx="10" class="pass" />
+<use href="#setup-robot" x="52" y="154" width="20" height="27" />
+<text x="78" y="154" font-size="11" class="t">Check comment #01.</text>
+<text x="78" y="171" font-size="11" class="t">The report is updated.</text>
+<text x="78" y="188" font-size="11" class="t">Reload the page.</text><svg x="244" y="48" width="378" height="268" viewBox="15 45 610 410" preserveAspectRatio="xMidYMin meet"><g><path d="M15 92H625" fill="none" stroke="#c9cfdd" stroke-width="2" /><path d="M28 92V56Q28 46 38 46H118Q128 46 128 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="78.0" y="75" font-size="16" font-weight="400" text-anchor="middle">Overview</text><path d="M130 92V56Q130 46 140 46H240Q250 46 250 56V92" fill="#fff" stroke="#c9cfdd" stroke-width="2" /><path d="M131 92H249" stroke="#fff" stroke-width="4" /><text x="190.0" y="75" font-size="16" font-weight="700" text-anchor="middle">Comments</text><path d="M252 92V56Q252 46 262 46H462Q472 46 472 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="362.0" y="75" font-size="16" font-weight="400" text-anchor="middle">Coverage &amp; sources</text><path d="M474 92V56Q474 46 484 46H602Q612 46 612 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="543.0" y="75" font-size="16" font-weight="400" text-anchor="middle">How to</text></g><g><path d="M15 92H625" fill="none" stroke="#c9cfdd" stroke-width="2" /><path d="M28 92V56Q28 46 38 46H118Q128 46 128 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="78.0" y="75" font-size="16" font-weight="400" text-anchor="middle">Overview</text><path d="M130 92V56Q130 46 140 46H240Q250 46 250 56V92" fill="#fff" stroke="#c9cfdd" stroke-width="2" /><path d="M131 92H249" stroke="#fff" stroke-width="4" /><text x="190.0" y="75" font-size="16" font-weight="700" text-anchor="middle">Comments</text><path d="M252 92V56Q252 46 262 46H462Q472 46 472 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="362.0" y="75" font-size="16" font-weight="400" text-anchor="middle">Coverage &amp; sources</text><path d="M474 92V56Q474 46 484 46H602Q612 46 612 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="543.0" y="75" font-size="16" font-weight="400" text-anchor="middle">How to</text></g><g><path d="M15 92H625" fill="none" stroke="#c9cfdd" stroke-width="2" /><path d="M28 92V56Q28 46 38 46H118Q128 46 128 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="78.0" y="75" font-size="16" font-weight="400" text-anchor="middle">Overview</text><path d="M130 92V56Q130 46 140 46H240Q250 46 250 56V92" fill="#fff" stroke="#c9cfdd" stroke-width="2" /><path d="M131 92H249" stroke="#fff" stroke-width="4" /><text x="190.0" y="75" font-size="16" font-weight="700" text-anchor="middle">Comments</text><path d="M252 92V56Q252 46 262 46H462Q472 46 472 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="362.0" y="75" font-size="16" font-weight="400" text-anchor="middle">Coverage &amp; sources</text><path d="M474 92V56Q474 46 484 46H602Q612 46 612 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="543.0" y="75" font-size="16" font-weight="400" text-anchor="middle">How to</text></g><g><path d="M15 92H625" fill="none" stroke="#c9cfdd" stroke-width="2" /><path d="M28 92V56Q28 46 38 46H118Q128 46 128 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="78.0" y="75" font-size="16" font-weight="400" text-anchor="middle">Overview</text><path d="M130 92V56Q130 46 140 46H240Q250 46 250 56V92" fill="#fff" stroke="#c9cfdd" stroke-width="2" /><path d="M131 92H249" stroke="#fff" stroke-width="4" /><text x="190.0" y="75" font-size="16" font-weight="700" text-anchor="middle">Comments</text><path d="M252 92V56Q252 46 262 46H462Q472 46 472 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="362.0" y="75" font-size="16" font-weight="400" text-anchor="middle">Coverage &amp; sources</text><path d="M474 92V56Q474 46 484 46H602Q612 46 612 56V92Z" fill="#e6e8ee" stroke="#c9cfdd" stroke-width="2" /><text x="543.0" y="75" font-size="16" font-weight="400" text-anchor="middle">How to</text></g><text x="39" y="118" font-size="12" font-weight="700">ID ↕</text><text x="75" y="118" font-size="12" font-weight="700">Comment ↕</text><text x="295" y="118" font-size="12" font-weight="700">Category ↕</text><text x="391" y="118" font-size="12" font-weight="700">Priority ↑</text><text x="470" y="118" font-size="12" font-weight="700">Status ↕</text><text x="543" y="118" font-size="12" font-weight="700">Resolution ↕</text><g transform="translate(0 132)"><rect x="28" y="0" width="584" height="45" rx="4" class="blue" /><text x="39" y="29" font-size="12" font-weight="400"><tspan font-size="8">#</tspan>01</text><text x="75" y="29" font-size="15" font-weight="700">▸ Check claim X</text><text x="295" y="29" font-size="12" font-weight="400">Analysis</text><text x="391" y="29" font-size="12" font-weight="400">High</text><text x="470" y="29" font-size="12" font-weight="400">Observed</text><text x="543" y="29" font-size="12" font-weight="400">Open</text></g><g transform="translate(0 180)"><rect x="28" y="0" width="584" height="45" rx="4" class="conf" /><text x="39" y="29" font-size="12" font-weight="400"><tspan font-size="8">#</tspan>02</text><text x="75" y="29" font-size="15" font-weight="700">▸ Test Fact X</text><text x="295" y="29" font-size="12" font-weight="400">New fact</text><text x="391" y="29" font-size="12" font-weight="400">High</text><text x="470" y="29" font-size="12" font-weight="400">Concern</text><text x="543" y="29" font-size="12" font-weight="400">Open</text></g><g transform="translate(0 228)"><rect x="28" y="0" width="584" height="45" rx="4" class="pass" /><text x="39" y="29" font-size="12" font-weight="400"><tspan font-size="8">#</tspan>03</text><text x="75" y="29" font-size="15" font-weight="700">▾ Fix Principle A</text><text x="295" y="29" font-size="12" font-weight="400">Theory</text><text x="391" y="29" font-size="12" font-weight="400">Medium</text><text x="470" y="29" font-size="12" font-weight="400">Suggestion</text><text x="543" y="29" font-size="12" font-weight="400">Open</text></g><g transform="translate(0 276)"><rect x="28" width="584" height="145" fill="#f7f9fc" /><g style="display:none"><text x="39" y="20" font-size="13" font-weight="700">Section 3 · Table 1</text><text x="39" y="43" font-size="12" font-weight="700">Evidence / basis:</text><text x="157" y="43" font-size="12" font-weight="400">12 / 24 = 50%; the prose says 60%.</text><text x="39" y="66" font-size="12" font-weight="700">What still needs testing:</text><text x="203" y="66" font-size="12" font-weight="400">Check the underlying records.</text><text x="39" y="89" font-size="12" font-weight="700">Next action:</text><text x="126" y="89" font-size="12" font-weight="400">Correct the prose after checking the records.</text><text x="39" y="112" font-size="12" font-weight="700">Current</text><text x="333" y="112" font-size="12" font-weight="700">Proposed</text><text x="39" y="135" font-size="13" font-weight="400">“60% chose the target.”</text><text x="333" y="135" font-size="13" font-weight="400">“50% chose the target.”</text><path d="M317 100V140" class="rule" /></g><g style="display:none"><text x="39" y="20" font-size="13" font-weight="700">Section 4 · A candidate contrast</text><text x="39" y="43" font-size="12" font-weight="700">Evidence / basis:</text><text x="157" y="43" font-size="12" font-weight="400">The assistant predicts a contrast for Fact X.</text><text x="39" y="66" font-size="12" font-weight="700">What still needs testing:</text><text x="203" y="66" font-size="12" font-weight="400">Obtain judgments from speakers.</text><text x="39" y="89" font-size="12" font-weight="700">Next action:</text><text x="126" y="89" font-size="12" font-weight="400">Test the examples; update the theory if needed.</text><text x="39" y="112" font-size="12" font-weight="700">Current</text><text x="333" y="112" font-size="12" font-weight="700">Proposed</text><text x="39" y="135" font-size="13" font-weight="400">Fact X is untested.</text><text x="333" y="135" font-size="13" font-weight="400">A concrete speaker study.</text><path d="M317 100V140" class="rule" /></g><g><text x="39" y="20" font-size="13" font-weight="700">Section 2 · Principle A</text><text x="39" y="43" font-size="12" font-weight="700">Evidence / basis:</text><text x="157" y="43" font-size="12" font-weight="400">The domain of Principle A is imprecise.</text><text x="39" y="66" font-size="12" font-weight="700">What still needs testing:</text><text x="203" y="66" font-size="12" font-weight="400">Check the revised principle against all facts.</text><text x="39" y="89" font-size="12" font-weight="700">Next action:</text><text x="126" y="89" font-size="12" font-weight="400">Specify the domain and test its predictions.</text><text x="39" y="112" font-size="12" font-weight="700">Current</text><text x="333" y="112" font-size="12" font-weight="700">Proposed</text><text x="39" y="135" font-size="13" font-weight="400">“Apply A when relevant.”</text><text x="333" y="135" font-size="13" font-weight="400">“Apply A to finite clauses.”</text><path d="M317 100V140" class="rule" /></g></g></svg><defs><marker id="setup-refine-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#1d2742" /></marker></defs><path d="M433 346V381H119V346" class="ln" marker-end="url(#setup-refine-arrow)" /><rect x="194" y="366" width="164" height="30" rx="8" class="blue" /><text x="276" y="386" text-anchor="middle" font-size="14" font-weight="700" class="t">Question and refine</text></svg>
+</figure><aside class="notes">The chat is the input and the report is the output. Ask a question in the chat and reload after the assistant updates the report.</aside></section><section class="slide " aria-labelledby="s5" data-title="Iteration"><div class="txt"><div class="num">4 / Keep going</div><h2 id="s5">Change your work,<br>the review or the<br>form of the report</h2><p>Test a claim, compare literature, improve a principle, or check a new draft.</p><p>Expand the work with new arguments and tests, alternative rewrites, a slide deck or handout, or changes to the report itself. How to illustrates the possibilities.</p><p class="small">The project keeps your findings and history. Return later and ask the assistant to resume.</p><p class="print-prompt">Launch prompt: ../PROMPT.md</p></div><figure data-figure="iterate"><svg class="fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 602" width="640" height="602" role="img" aria-label="Example requests surround an assistant: check a derivation, compare papers, rewrite the abstract, change the report, plan work, make a slide deck or handout, produce a Lean version of the theory and facts, check a claim with Python, improve the theory by fixing principles, streamlining it, proposing new ideas and tests, or check a new paper version and update the report."><!-- Character symbols adapted from linglab. MIT License  Copyright (c) 2026 Emmanuel Chemla  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  --><style>text{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;fill:#1d2742}.muted{fill:#4a5572}.blue{fill:#dbe6fb;stroke:#2f5fc4;stroke-width:2}.pass{fill:#d4f0e2;stroke:#1f8a5b;stroke-width:2}.conf{fill:#fbebc4;stroke:#b87800;stroke-width:2}.fail{fill:#f8dad8;stroke:#c63d37;stroke-width:2}.card{fill:#fff;stroke:#c9cfdd;stroke-width:2}.line{fill:none;stroke:#1d2742;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.rule{stroke:#c9cfdd;stroke-width:2}</style><defs><symbol id="iterate-linguist" viewBox="0 0 100 135">
+      <path d="M26 125v-40q0-18 24-18t24 18v40z" fill="#2f5fc4" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="50" cy="40" r="22" fill="#f2c9a0" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M27 38q0-24 23-24t23 24q-10-10-23-9t-23 9z" fill="#1d2742"/>
+      <circle cx="41" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="59" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M48 42h4M43 54q7 6 14 0" fill="none" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="58" y="88" width="30" height="22" rx="3" fill="#fbebc4" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M62 95h22M62 101h16" stroke="#1d2742" stroke-width="2" stroke-linecap="round"/>
+    </symbol><symbol id="iterate-robot" viewBox="0 0 100 135">
+      <path d="M50 14v10" stroke="#1d2742" stroke-width="2.5"/><circle cx="50" cy="11" r="5" fill="#b87800" stroke="#1d2742" stroke-width="2"/>
+      <rect x="20" y="24" width="60" height="46" rx="12" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="38" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5"/><circle cx="62" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="39" cy="46" r="3" fill="#1d2742"/><circle cx="63" cy="46" r="3" fill="#1d2742"/>
+      <path d="M40 60h20" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="28" y="74" width="44" height="44" rx="10" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5"/>
+      <rect x="38" y="84" width="24" height="14" rx="3" fill="#ffffff" stroke="#1d2742" stroke-width="2"/>
+      <path d="M28 84l-10 14M72 84l10 14" stroke="#1d2742" stroke-width="3" stroke-linecap="round"/>
+    </symbol><symbol id="iterate-doc" viewBox="0 0 40 50"><path d="M4 2h24l8 8v38H4z" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round"/><path d="M10 18h20M10 25h20M10 32h14" stroke="#4a5572" stroke-width="2.5" stroke-linecap="round"/></symbol><marker id="iterate-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#1d2742"/></marker></defs><rect width="640" height="602" rx="16" fill="#fff"/>
+<use href="#iterate-robot" x="270" y="135" width="100" height="135"/>
+<rect x="14" y="16" width="278" height="65" rx="12" class="blue"/>
+<text x="29" y="43" font-size="20" font-weight="700">Check this derivation.</text><text x="29" y="68" font-size="16">Use the exact definitions.</text>
+<rect x="348" y="16" width="278" height="65" rx="12" class="pass"/>
+<text x="363" y="43" font-size="20" font-weight="700">Compare these papers.</text><text x="363" y="68" font-size="16">Show the evidence in each.</text>
+<rect x="14" y="102" width="236" height="65" rx="12" class="conf"/>
+<text x="28" y="129" font-size="19" font-weight="700">Rewrite the abstract.</text><text x="28" y="154" font-size="16">Show five alternatives.</text>
+<rect x="390" y="102" width="236" height="65" rx="12" class="blue"/>
+<text x="404" y="129" font-size="19" font-weight="700">Change the report.</text><text x="404" y="154" font-size="16">Group by paper section.</text>
+<rect x="14" y="207" width="236" height="74" rx="12" class="pass"/>
+<text x="28" y="236" font-size="18" font-weight="700">What should I do next?</text><text x="28" y="261" font-size="16">Fit it into a working day.</text>
+<rect x="390" y="207" width="236" height="74" rx="12" class="conf"/>
+<text x="404" y="237" font-size="19" font-weight="700">Make a slide deck/</text><text x="404" y="262" font-size="19" font-weight="700">handout.</text>
+<rect x="14" y="313" width="295" height="85" rx="12" class="blue"/>
+<text x="29" y="346" font-size="20" font-weight="700">Produce a Lean version</text><text x="29" y="377" font-size="19">of the theory and the facts.</text>
+<rect x="331" y="313" width="295" height="85" rx="12" class="pass"/>
+<text x="348" y="346" font-size="21" font-weight="700">Check claim X</text><text x="348" y="377" font-size="21">with Python.</text>
+<rect x="14" y="421" width="612" height="65" rx="12" class="conf"/>
+<text x="29" y="448" font-size="20" font-weight="700">Check the new version of the paper,</text>
+<text x="29" y="474" font-size="20">and update the report.</text>
+<rect x="14" y="507" width="612" height="81" rx="12" fill="#efe8fa" stroke="#6a49c2" stroke-width="2"/>
+<text x="29" y="534" font-size="21" font-weight="700">Improve the theory.</text>
+<text x="29" y="560" font-size="14">Fix principles · streamline theory · propose new ideas · propose new tests</text>
+<a href="https://github.com/ai-for-linguistics/linglab" target="_blank" rel="noopener"><text x="610" y="580" text-anchor="end" font-size="12" style="fill:#2f5fc4;text-decoration:underline">Check out linglab ↗</text></a>
+</svg>
+</figure><aside class="notes">Examples are possibilities, not mandatory stages. Scope and layout can change at any time.</aside></section><section class="slide " aria-labelledby="s6" data-title="Sharing with AI"><div class="txt"><div class="num">5 / Before sharing</div><h2 id="s6">Use it for your own work</h2><p>That is the recommended use. Share others’ manuscripts or confidential material only with permission.</p><p>Material you share may become accessible to AI agents, providers, and companies operating the tools.</p><p class="small">Handling and retention depend on the service and settings. Check them before sharing unpublished or sensitive work.</p><p class="print-prompt">Launch prompt: ../PROMPT.md</p></div><figure data-figure="sharing"><svg class="fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="img" aria-label="Your manuscript goes to an AI service whose agents, tools, and provider may access it. Check permission, confidentiality, and settings."><!-- Character symbols adapted from linglab. MIT License  Copyright (c) 2026 Emmanuel Chemla  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  --><style>text{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;fill:#1d2742}.muted{fill:#4a5572}.blue{fill:#dbe6fb;stroke:#2f5fc4;stroke-width:2}.pass{fill:#d4f0e2;stroke:#1f8a5b;stroke-width:2}.conf{fill:#fbebc4;stroke:#b87800;stroke-width:2}.fail{fill:#f8dad8;stroke:#c63d37;stroke-width:2}.card{fill:#fff;stroke:#c9cfdd;stroke-width:2}.line{fill:none;stroke:#1d2742;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.rule{stroke:#c9cfdd;stroke-width:2}</style><defs><symbol id="sharing-linguist" viewBox="0 0 100 135">
+      <path d="M26 125v-40q0-18 24-18t24 18v40z" fill="#2f5fc4" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="50" cy="40" r="22" fill="#f2c9a0" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M27 38q0-24 23-24t23 24q-10-10-23-9t-23 9z" fill="#1d2742"/>
+      <circle cx="41" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="59" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M48 42h4M43 54q7 6 14 0" fill="none" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="58" y="88" width="30" height="22" rx="3" fill="#fbebc4" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M62 95h22M62 101h16" stroke="#1d2742" stroke-width="2" stroke-linecap="round"/>
+    </symbol><symbol id="sharing-robot" viewBox="0 0 100 135">
+      <path d="M50 14v10" stroke="#1d2742" stroke-width="2.5"/><circle cx="50" cy="11" r="5" fill="#b87800" stroke="#1d2742" stroke-width="2"/>
+      <rect x="20" y="24" width="60" height="46" rx="12" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="38" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5"/><circle cx="62" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="39" cy="46" r="3" fill="#1d2742"/><circle cx="63" cy="46" r="3" fill="#1d2742"/>
+      <path d="M40 60h20" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="28" y="74" width="44" height="44" rx="10" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5"/>
+      <rect x="38" y="84" width="24" height="14" rx="3" fill="#ffffff" stroke="#1d2742" stroke-width="2"/>
+      <path d="M28 84l-10 14M72 84l10 14" stroke="#1d2742" stroke-width="3" stroke-linecap="round"/>
+    </symbol><symbol id="sharing-doc" viewBox="0 0 40 50"><path d="M4 2h24l8 8v38H4z" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round"/><path d="M10 18h20M10 25h20M10 32h14" stroke="#4a5572" stroke-width="2.5" stroke-linecap="round"/></symbol><marker id="sharing-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#1d2742"/></marker></defs><rect width="640" height="420" rx="16" fill="#fff"/><use href="#sharing-linguist" x="37" y="65" width="95" height="128"/><use href="#sharing-doc" x="161" y="87" width="56" height="70"/><text x="125" y="229" font-size="22" font-weight="700" text-anchor="middle" class="">Your own work</text><path d="M237 120H325" class="line" style="stroke:#1d2742" marker-end="url(#sharing-arrow)"/><rect x="350" y="44" width="260" height="157" rx="12" class="blue"/><use href="#sharing-robot" x="358" y="68" width="83" height="112"/><text x="515" y="91" font-size="24" font-weight="700" text-anchor="middle" class="">AI service</text><text x="515" y="124" font-size="17" font-weight="400" text-anchor="middle" class="">Agents and tools</text><text x="515" y="153" font-size="17" font-weight="400" text-anchor="middle" class="">Provider / company</text><rect x="33" y="271" width="574" height="104" rx="12" class="conf"/><text x="320" y="302" font-size="24" font-weight="700" text-anchor="middle" class="">Check what you share</text><text x="320" y="334" font-size="20" font-weight="400" text-anchor="middle" class="">Permission · confidentiality · service settings</text><text x="320" y="360" font-size="18" font-weight="400" text-anchor="middle" class="">Handling and retention depend on the service.</text></svg>
+</figure><aside class="notes">Do not imply that the kit grants confidentiality or controls a provider’s retention policy. The user needs to choose an appropriate service.</aside></section><section class="slide " aria-labelledby="s7" data-title="Credits and tokens"><div class="txt"><div class="num">6 / Costs</div><h2 id="s7">Set a budget</h2><p>Your assistant uses your credits or tokens. Long reviews and new analyses can cost more.</p><p>Ask for an estimate before big steps. Start small, then choose what is worth doing next.</p><p class="small">Author revision time, assistant runtime, and token costs are different. Estimates may be uncertain.</p><p class="print-prompt">Launch prompt: ../PROMPT.md</p></div><figure data-figure="budget"><svg class="fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="img" aria-label="Begin with a bounded review. Before deeper work, ask for an estimate and set a budget."><!-- Character symbols adapted from linglab. MIT License  Copyright (c) 2026 Emmanuel Chemla  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  --><style>text{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;fill:#1d2742}.muted{fill:#4a5572}.blue{fill:#dbe6fb;stroke:#2f5fc4;stroke-width:2}.pass{fill:#d4f0e2;stroke:#1f8a5b;stroke-width:2}.conf{fill:#fbebc4;stroke:#b87800;stroke-width:2}.fail{fill:#f8dad8;stroke:#c63d37;stroke-width:2}.card{fill:#fff;stroke:#c9cfdd;stroke-width:2}.line{fill:none;stroke:#1d2742;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.rule{stroke:#c9cfdd;stroke-width:2}</style><defs><symbol id="budget-linguist" viewBox="0 0 100 135">
+      <path d="M26 125v-40q0-18 24-18t24 18v40z" fill="#2f5fc4" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="50" cy="40" r="22" fill="#f2c9a0" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M27 38q0-24 23-24t23 24q-10-10-23-9t-23 9z" fill="#1d2742"/>
+      <circle cx="41" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="59" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M48 42h4M43 54q7 6 14 0" fill="none" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="58" y="88" width="30" height="22" rx="3" fill="#fbebc4" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M62 95h22M62 101h16" stroke="#1d2742" stroke-width="2" stroke-linecap="round"/>
+    </symbol><symbol id="budget-robot" viewBox="0 0 100 135">
+      <path d="M50 14v10" stroke="#1d2742" stroke-width="2.5"/><circle cx="50" cy="11" r="5" fill="#b87800" stroke="#1d2742" stroke-width="2"/>
+      <rect x="20" y="24" width="60" height="46" rx="12" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="38" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5"/><circle cx="62" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="39" cy="46" r="3" fill="#1d2742"/><circle cx="63" cy="46" r="3" fill="#1d2742"/>
+      <path d="M40 60h20" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="28" y="74" width="44" height="44" rx="10" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5"/>
+      <rect x="38" y="84" width="24" height="14" rx="3" fill="#ffffff" stroke="#1d2742" stroke-width="2"/>
+      <path d="M28 84l-10 14M72 84l10 14" stroke="#1d2742" stroke-width="3" stroke-linecap="round"/>
+    </symbol><symbol id="budget-doc" viewBox="0 0 40 50"><path d="M4 2h24l8 8v38H4z" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round"/><path d="M10 18h20M10 25h20M10 32h14" stroke="#4a5572" stroke-width="2.5" stroke-linecap="round"/></symbol><marker id="budget-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#1d2742"/></marker></defs><rect width="640" height="420" rx="16" fill="#fff"/><text x="34" y="45" font-size="24" font-weight="700" text-anchor="start" class="">A bounded first pass</text><rect x="35" y="78" width="569" height="49" rx="8" class="pass"/><text x="54" y="110" font-size="21" font-weight="700" text-anchor="start" class="">Paper</text><text x="320" y="110" font-size="21" font-weight="700" text-anchor="middle" class="">First review</text><text x="581" y="110" font-size="21" font-weight="700" text-anchor="end" class="">Next step</text><path d="M320 145V181" class="line" style="stroke:#1d2742" marker-end="url(#budget-arrow)"/><rect x="35" y="202" width="569" height="116" rx="12" class="conf"/><text x="55" y="235" font-size="24" font-weight="700" text-anchor="start" class="">Deeper work can cost more</text><text x="55" y="267" font-size="19" font-weight="400" text-anchor="start" class="">Literature search · proof checks · new analyses</text><text x="55" y="296" font-size="19" font-weight="400" text-anchor="start" class="">Ask for an estimate and set a stopping point.</text><use href="#budget-robot" x="52" y="334" width="43" height="58"/><text x="320" y="371" font-size="22" font-weight="700" text-anchor="middle" class="">“What can you do within my budget?”</text></svg>
+</figure><aside class="notes">A short review should exist before optional expensive work begins. Budget estimates are estimates, not measured usage.</aside></section><section class="slide " aria-labelledby="s8" data-title="Beta and next step"><div class="txt"><div class="num">7 / Your judgment</div><h2 id="s8">Check the feedback.<br>Then iterate.</h2><p>This produces AI material.</p><p>Inspect the evidence and preserve the strength of your claims. You decide what to change.</p><div class="btns"><a class="btn" href="../dist/lingrev-beta.zip" download>Download kit</a><button class="btn alt launch" type="button">Get the launch prompt</button></div><p class="print-prompt">Launch prompt: ../PROMPT.md</p></div><figure data-figure="judgment"><svg class="fig" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420" role="img" aria-label="The assistant proposes a finding, the author checks it and decides what to revise."><!-- Character symbols adapted from linglab. MIT License  Copyright (c) 2026 Emmanuel Chemla  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  --><style>text{font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;fill:#1d2742}.muted{fill:#4a5572}.blue{fill:#dbe6fb;stroke:#2f5fc4;stroke-width:2}.pass{fill:#d4f0e2;stroke:#1f8a5b;stroke-width:2}.conf{fill:#fbebc4;stroke:#b87800;stroke-width:2}.fail{fill:#f8dad8;stroke:#c63d37;stroke-width:2}.card{fill:#fff;stroke:#c9cfdd;stroke-width:2}.line{fill:none;stroke:#1d2742;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}.rule{stroke:#c9cfdd;stroke-width:2}</style><defs><symbol id="judgment-linguist" viewBox="0 0 100 135">
+      <path d="M26 125v-40q0-18 24-18t24 18v40z" fill="#2f5fc4" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="50" cy="40" r="22" fill="#f2c9a0" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M27 38q0-24 23-24t23 24q-10-10-23-9t-23 9z" fill="#1d2742"/>
+      <circle cx="41" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="59" cy="42" r="7" fill="none" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M48 42h4M43 54q7 6 14 0" fill="none" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="58" y="88" width="30" height="22" rx="3" fill="#fbebc4" stroke="#1d2742" stroke-width="2.5"/>
+      <path d="M62 95h22M62 101h16" stroke="#1d2742" stroke-width="2" stroke-linecap="round"/>
+    </symbol><symbol id="judgment-robot" viewBox="0 0 100 135">
+      <path d="M50 14v10" stroke="#1d2742" stroke-width="2.5"/><circle cx="50" cy="11" r="5" fill="#b87800" stroke="#1d2742" stroke-width="2"/>
+      <rect x="20" y="24" width="60" height="46" rx="12" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="38" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5"/><circle cx="62" cy="45" r="7" fill="#ffffff" stroke="#1d2742" stroke-width="2.5"/>
+      <circle cx="39" cy="46" r="3" fill="#1d2742"/><circle cx="63" cy="46" r="3" fill="#1d2742"/>
+      <path d="M40 60h20" stroke="#1d2742" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="28" y="74" width="44" height="44" rx="10" fill="#cdd7ea" stroke="#1d2742" stroke-width="2.5"/>
+      <rect x="38" y="84" width="24" height="14" rx="3" fill="#ffffff" stroke="#1d2742" stroke-width="2"/>
+      <path d="M28 84l-10 14M72 84l10 14" stroke="#1d2742" stroke-width="3" stroke-linecap="round"/>
+    </symbol><symbol id="judgment-doc" viewBox="0 0 40 50"><path d="M4 2h24l8 8v38H4z" fill="#ffffff" stroke="#1d2742" stroke-width="2.5" stroke-linejoin="round"/><path d="M10 18h20M10 25h20M10 32h14" stroke="#4a5572" stroke-width="2.5" stroke-linecap="round"/></symbol><marker id="judgment-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#1d2742"/></marker></defs><rect width="640" height="420" rx="16" fill="#fff"/><use href="#judgment-robot" x="29" y="67" width="89" height="120"/><rect x="144" y="37" width="460" height="109" rx="12" class="blue"/><text x="165" y="72" font-size="24" font-weight="700" text-anchor="start" class="">A finding is a starting point</text><text x="165" y="106" font-size="18" font-weight="400" text-anchor="start" class="">Ask for the passage, calculation, or argument.</text><text x="165" y="132" font-size="18" font-weight="400" text-anchor="start" class="">Challenge the reading when it seems wrong.</text><path d="M376 163V202" class="line" style="stroke:#1d2742" marker-end="url(#judgment-arrow)"/><use href="#judgment-linguist" x="29" y="252" width="89" height="120"/><rect x="144" y="229" width="460" height="126" rx="12" class="pass"/><text x="165" y="264" font-size="24" font-weight="700" text-anchor="start" class="">You decide what to revise</text><text x="165" y="298" font-size="19" font-weight="400" text-anchor="start" class="">Check meaning and evidential strength.</text><text x="165" y="330" font-size="18" font-weight="400" text-anchor="start" class="">Correct, resolve, or retract findings together.</text><text x="320" y="400" font-size="18" font-weight="400" text-anchor="middle" class="muted">Beta · AI assisted · feedback can be wrong</text></svg>
+</figure><aside class="notes">End by offering the prompt. The user can challenge a finding and have it corrected, resolved, or retracted.</aside></section></main>
+<div id="slide-caution">AI assisted. Feedback can be wrong. Check sharing settings and token costs.</div>
+<footer id="ui"><button id="prev" class="nav" type="button" aria-label="Previous slide">← Previous</button><div class="fmid"><div class="fb"><a class="fbtn" href="../dist/lingrev-beta.zip" download>Download kit</a><button class="fbtn launch" type="button">Get the launch prompt</button></div><div class="notices"><b>lingrev · beta</b><br>Review your own work.</div></div><span id="count" aria-live="polite">1 / 8</span><button id="next" class="nav" type="button" aria-label="Next slide">Next →</button></footer>
+<dialog id="prompt-dialog" aria-labelledby="prompt-title"><h2 id="prompt-title">The launch prompt</h2><p>Download the kit, then copy this into your assistant. It handles setup and asks for missing material.</p><pre id="prompt-text">I want to use lingrev to review my work.
+
+1. Find the lingrev kit in the folder, attachment, or address I supplied.
+   If I supplied lingrev-beta.zip, unpack it. Otherwise look in the current
+   folder and Downloads for lingrev-beta.zip or a lingrev folder containing
+   BOOTSTRAP.md. If you cannot find it, ask me where it is.
+2. Ask me what to review if I have not already supplied it. I can give you
+   just the paper, the paper with relevant literature (PDFs or links), or
+   my whole working folder, including code, data, and notes. Identify the
+   current manuscript if there are several drafts. Ask where to create the review project
+   only if no suitable location is clear. Optional goals can come later.
+3. Put a copy of the kit in &lt;project&gt;/utils without overwriting existing
+   files. If utils/BOOTSTRAP.md already belongs to lingrev, resume that
+   project. Read utils/BOOTSTRAP.md and follow it.
+4. Briefly explain sharing with AI providers, token costs, and the need to
+   check the feedback, as described in the bootstrap. Then set up the
+   workspace and produce a first review automatically. Keep originals
+   intact. Save the dashboard before offering optional deeper work.
+5. Consider scientific as well as editorial feedback: counterevidence,
+   candidate facts, cross-linguistic extensions, clearer or improved
+   principles, terminology, local rewrites, paper structure, new arguments,
+   experiments, plots and tables, and future work. Check typos, numerical
+   errors, and incorrect applications of principles or methods as well.
+   Consider formal checks,
+   replaying supplied code, or new analyses when useful and feasible. Label
+   LLM judgments as tentative and propose real tests. Show current and
+   proposed passages side by side.
+   Offer alternative abstracts, titles, main headlines, or paper structures
+   with possible emphases in bullet points when useful. Suggest additional
+   plots or a small online analysis when they could clarify a claim.
+6. I will use the chat to iterate and the tabbed dashboard to read the
+   review. Use the kit&#x27;s current report template: Overview, Comments,
+   Coverage &amp; sources, and How to. Comments is a sortable table with
+   expandable details. My work, the review, and the form of the report can
+   change at any time. Start with a concise first pass unless I requested
+   a focused or deep review; follow my scope and budget without treating
+   the first pass as a limit on later work.
+   Keep specific suggestions in Comments. How to should invite me to
+   choose comments and expand my study, review, or report, with the setup
+   and possibilities pictures side by side. Follow the bootstrap for the layout.</pre><div class="actions"><button id="copy-prompt" class="copy" type="button">Copy prompt</button><a href="../dist/lingrev-beta.zip" download>Download kit</a><button id="close-prompt" class="copy" type="button">Close</button></div><p id="copy-status" role="status"></p></dialog><script>
+(() => {
+ const slides=[...document.querySelectorAll('.slide')]; let index=0;
+ document.querySelectorAll('figure[data-figure="evidence"] svg').forEach(svg=>{
+  const demoRows=[...svg.querySelectorAll('[data-comment-row]')];
+  const detail=svg.querySelector('[data-comment-detail]'); let opened=2;
+  function expandComment(selected){
+   opened=opened===selected ? -1 : selected;
+   demoRows.forEach((row,i)=>{
+    row.setAttribute('transform',`translate(0 ${123+i*36+(opened>=0&&i>opened?146:0)})`);
+    row.setAttribute('aria-expanded',String(i===opened));
+    row.querySelector('[data-comment-title]').textContent=`${i===opened?'▾':'▸'} ${['Check claim X','Test Fact X','Fix Principle A'][i]}`;
+   });
+   detail.style.display=opened<0?'none':'';
+   detail.setAttribute('transform',`translate(0 ${159+Math.max(0,opened)*36})`);
+   svg.querySelectorAll('[data-comment-content]').forEach((content,i)=>content.style.display=i===opened?'':'none');
+  }
+  demoRows.forEach((row,i)=>{
+   row.addEventListener('click',()=>expandComment(i));
+   row.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();event.stopPropagation();expandComment(i)}});
+  });
+ });
+
+ const prev=document.getElementById('prev'),next=document.getElementById('next');
+ function show(n,update=true){index=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,i)=>{s.classList.toggle('active',i===index);s.setAttribute('aria-hidden',String(i!==index));s.inert=i!==index});document.getElementById('count').textContent=`${index+1} / ${slides.length}`;document.getElementById('bar').style.width=`${(index+1)/slides.length*100}%`;prev.disabled=index===0;next.disabled=index===slides.length-1;if(update)history.replaceState(null,'',`#${index+1}`);slides[index].scrollTop=0;window.scrollTo(0,0)}
+ prev.addEventListener('click',()=>show(index-1));next.addEventListener('click',()=>show(index+1));
+ const dialog=document.getElementById('prompt-dialog');
+ document.querySelectorAll('.launch').forEach(b=>b.addEventListener('click',()=>dialog.showModal()));document.getElementById('close-prompt').addEventListener('click',()=>dialog.close());
+ document.getElementById('copy-prompt').addEventListener('click',async()=>{const prompt=document.getElementById('prompt-text');try{await navigator.clipboard.writeText(prompt.textContent);document.getElementById('copy-status').textContent='Copied. Paste the prompt into your assistant.'}catch{const range=document.createRange();range.selectNodeContents(prompt);const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);document.getElementById('copy-status').textContent='Copying is unavailable. The prompt is selected. Copy it manually.'}});
+ document.addEventListener('keydown',e=>{if(dialog.open||e.altKey||e.ctrlKey||e.metaKey||['BUTTON','A','INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))return;if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(index+1)}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(index-1)}if(e.key==='Home')show(0);if(e.key==='End')show(slides.length-1)});
+ const initial=Number(location.hash.slice(1));show(Number.isInteger(initial)&&initial>0?initial-1:0,false);
+ window.addEventListener('hashchange',()=>{const n=Number(location.hash.slice(1));if(Number.isInteger(n)&&n>0)show(n-1,false)});
+  const printState=()=>slides.forEach(s=>{s.inert=false;s.removeAttribute('aria-hidden')});window.addEventListener('beforeprint',printState);window.addEventListener('afterprint',()=>show(index,false));
+})();
+</script></body></html>
